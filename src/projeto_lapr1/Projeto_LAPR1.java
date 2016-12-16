@@ -34,8 +34,12 @@ public class Projeto_LAPR1 {
         int nLinhas = 0;
 
         nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
+        System.out.println(nLinhas + " linhas de info relevante lidas");
 
-        mc_criterios = normalizar(mc_criterios);
+        double[] vPrioridadeRelCriterios = prioridadeRelativa(mc_criterios);
+        double[] vPrioridadeRelCriterio1 = prioridadeRelativa(matrizCriterio1);
+        double[] vPrioridadeRelCriterio2 = prioridadeRelativa(matrizCriterio2);
+        double[] vPrioridadeRelCriterio3 = prioridadeRelativa(matrizCriterio3);
 
         Matrix criterios = new Basic2DMatrix(mc_criterios);
         Matrix criterio1 = new Basic2DMatrix(matrizCriterio1);
@@ -45,7 +49,6 @@ public class Projeto_LAPR1 {
     }
 
     public static int LerFicheiroInput(int nLinhas, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3) throws FileNotFoundException {
-
         /*Formatter ler = new Formatter(new File("Dados.txt"));*/
         Scanner readFile = new Scanner(new File("Dados.txt"));
         while (readFile.hasNext()) {
@@ -60,7 +63,6 @@ public class Projeto_LAPR1 {
 
     public static int tratarInput(String linhaDados, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3, int nLinhas) {
         String temp[] = linhaDados.split(" ");/*Split testes*/
- /*String nomeMatriz = temp[0];*/
         for (int j = 0; j < temp.length; j++) {
             if (nLinhas == 0) {
                 v_criterios[j] = temp[j];
@@ -93,9 +95,37 @@ public class Projeto_LAPR1 {
         }
     }
 
-    public static double[][] normalizar(double[][] matriz) {
-        
-        return matriz;
+    /**
+     *
+     * @param matrizO matriz original / antes de normalizar
+     * @return
+     */
+    public static double[] prioridadeRelativa(double matrizO[][]) {
+        double[] vPrioridadeRelativa = new double[3];
+        double[] somatorio = somatoriosColunas(matrizO);
+
+        for (int i = 0; i < matrizO.length; i++) {
+            for (int j = 0; j < matrizO[i].length; j++) {
+                vPrioridadeRelativa[i] = calculosPrioridadeRelativa(somatorio, matrizO, i, j);
+            }
+        }
+        return vPrioridadeRelativa;
+    }
+
+    public static double calculosPrioridadeRelativa(double[] somatorio, double[][] matrizO, int i, int j) {
+        double valorPrioridadeRelativa = 0;
+
+        return valorPrioridadeRelativa;
+    }
+
+    public static double[] somatoriosColunas(double[][] matriz) {
+        double[] somatorio = new double[matriz.length];
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                somatorio[i] = somatorio[i] + matriz[i][j];
+            }
+        }
+        return somatorio;
     }
 
     public static void FazerVetoresProprios(Matrix criterios, Matrix criterio1, Matrix criterio2, Matrix criterio3) {
