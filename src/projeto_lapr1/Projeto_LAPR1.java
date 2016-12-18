@@ -18,9 +18,8 @@ import org.la4j.decomposition.EigenDecompositor;
  * @author PC
  */
 public class Projeto_LAPR1 {
-
+    public static Scanner sc = new Scanner(System.in);
     public static double[] RandomConsistency = {0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.42};/*Vetor Randômio até ao n=8*/
-    public static int N_MATRIZES = 4;/*Nº de critérios + a matriz de comparação de critérios*/
     public static String[] v_criterios = new String[4];
     public static String[] v_criterio1 = new String[5];
     public static String[] v_criterio2 = new String[5];
@@ -29,25 +28,46 @@ public class Projeto_LAPR1 {
     public static double[][] matrizCriterio1 = new double[4][4];
     public static double[][] matrizCriterio2 = new double[4][4];
     public static double[][] matrizCriterio3 = new double[4][4];
+    public static double[][] matrizSomatorios=new double[4][4];
 
     public static void main(String[] args) throws FileNotFoundException {
-        int nLinhas = 0;
-
-        nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
-        System.out.println(nLinhas + " linhas de info relevante lidas");
-
-        double[] vPrioridadeRelCriterios = prioridadeRelativa(mc_criterios);
-        double[] vPrioridadeRelCriterio1 = prioridadeRelativa(matrizCriterio1);
-        double[] vPrioridadeRelCriterio2 = prioridadeRelativa(matrizCriterio2);
-        double[] vPrioridadeRelCriterio3 = prioridadeRelativa(matrizCriterio3);
-
-        Matrix criterios = new Basic2DMatrix(mc_criterios);
-        Matrix criterio1 = new Basic2DMatrix(matrizCriterio1);
-        Matrix criterio2 = new Basic2DMatrix(matrizCriterio2);
-        Matrix criterio3 = new Basic2DMatrix(matrizCriterio3);
-        FazerVetoresProprios(criterios, criterio1, criterio2, criterio3);
+        int nLinhas,op;
+        do {
+            op = menu();
+            switch (op) {
+                case 1:
+                    nLinhas=0;
+                    nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
+                    System.out.println(nLinhas + " linhas de info relevante lidas");
+                    matrizSomatorios=criarMatrizSomatorios(matrizSomatorios,mc_criterios,matrizCriterio1,matrizCriterio2,matrizCriterio3);
+                    break;
+                case 2:
+                    nLinhas=0;
+                    nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
+                    System.out.println(nLinhas + " linhas de info relevante lidas");
+                    criarMatrizSomatorios(matrizSomatorios,mc_criterios,matrizCriterio1,matrizCriterio2,matrizCriterio3);
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opção incorreta.Repita");
+                    break;
+            }
+        } while (op != 0);
     }
-
+    
+    private static int menu() {
+        String texto = "\nMenu:"
+                + "\n Efetuar a operação com valores aproximados (Digite 1)"
+                + "\n Efetuar a operação com valores exatos (Digite 2)"
+                + "\n FIM (0)"
+                + "\n Qual é a opção?";
+        System.out.printf("%n%s%n", texto);
+        int op = sc.nextInt();
+        sc.nextLine();
+        return op;
+    }
+    
     public static int LerFicheiroInput(int nLinhas, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3) throws FileNotFoundException {
         /*Formatter ler = new Formatter(new File("Dados.txt"));*/
         Scanner readFile = new Scanner(new File("Dados.txt"));
@@ -60,7 +80,7 @@ public class Projeto_LAPR1 {
         readFile.close();
         return nLinhas;
     }
-
+    
     public static int tratarInput(String linhaDados, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3, int nLinhas) {
         String temp[] = linhaDados.split(" ");/*Split testes*/
         for (int j = 0; j < temp.length; j++) {
@@ -85,7 +105,7 @@ public class Projeto_LAPR1 {
         nLinhas++;
         return nLinhas;
     }
-
+    
     public static double StringToDouble(String[] temp, int j) {
         if (temp[j].contains("/")) {
             String[] tempDiv = temp[j].split("/");
@@ -95,32 +115,15 @@ public class Projeto_LAPR1 {
         }
     }
 
-    /**
-     *
-     * @param matrizO matriz original / antes de normalizar
-     * @return
-     */
-    public static double[] prioridadeRelativa(double matrizO[][]) {
-        double[] vPrioridadeRelativa = new double[3];
-        double[] somatorio = somatoriosColunas(matrizO);
-
-        for (int i = 0; i < matrizO.length; i++) {
-            for (int j = 0; j < matrizO[i].length; j++) {
-                vPrioridadeRelativa[i] = calculosPrioridadeRelativa(somatorio, matrizO, i, j);
-            }
-        }
-        return vPrioridadeRelativa;
+    /*CASE 1*/
+    public static double[][] criarMatrizSomatorios(double[][] matrizSomatorios,double[][] mc_criterios,double[][] matrizCriterio1,double[][] matrizCriterio2,double[][] matrizCriterio3){
+            matrizSomatorios[0]=somatoriosColunas(mc_criterios);
+            matrizSomatorios[1]=somatoriosColunas(matrizCriterio1);
+            matrizSomatorios[2]=somatoriosColunas(matrizCriterio2);
+            matrizSomatorios[3]=somatoriosColunas(matrizCriterio3);
+        return matrizSomatorios;
     }
-
-    /**
-     * matrizO é a matriz original e nao a normalizada
-     */
-    public static double calculosPrioridadeRelativa(double[] somatorio, double[][] matrizO, int i, int j) {
-        double valorPrioridadeRelativa = 0;
-
-        return valorPrioridadeRelativa;
-    }
-
+    
     public static double[] somatoriosColunas(double[][] matriz) {
         double[] somatorio = new double[matriz.length];
         for (int i = 0; i < matriz.length; i++) {
@@ -130,21 +133,5 @@ public class Projeto_LAPR1 {
         }
         return somatorio;
     }
-
-    public static void FazerVetoresProprios(Matrix criterios, Matrix criterio1, Matrix criterio2, Matrix criterio3) {
-        //Pedir vetores proprios e valores
-        EigenDecompositor eigenD = new EigenDecompositor(criterios);
-        Matrix[] criteriosD = eigenD.decompose();
-        for (int i = 0; i < criteriosD.length; i++) {
-            System.out.println(criteriosD[i]);
-        }
-        //Converter objeto Matrix (que sao duas matrizes) para array
-        /*double matA[][] = criteriosD[0].toDenseMatrix().toArray();
-        double matB[][] = criteriosD[1].toDenseMatrix().toArray();
-        for(int i =0;i<matA.length;i++){
-            for(int j=0;j<matB.length;j++){
-                System.out.println(matA[i][j]);
-            }
-        }*/
-    }
+    
 }
