@@ -112,6 +112,9 @@ public class Projeto_LAPR1 {
         return vPrioridadeRelativa;
     }
 
+    /**
+     * matrizO é a matriz original e nao a normalizada
+     */
     public static double calculosPrioridadeRelativa(double[] somatorio, double[][] matrizO, int i, int j) {
         double valorPrioridadeRelativa = 0;
 
@@ -122,7 +125,7 @@ public class Projeto_LAPR1 {
         double[] somatorio = new double[matriz.length];
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
-                somatorio[i] = somatorio[i] + matriz[i][j];
+                somatorio[i] = somatorio[i] + matriz[j][i];
             }
         }
         return somatorio;
