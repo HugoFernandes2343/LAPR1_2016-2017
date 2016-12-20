@@ -22,6 +22,7 @@ public class Projeto_LAPR1 {
     public static Scanner sc = new Scanner(System.in);
     public static double[] RandomConsistency = {0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.42};/*Vetor Randômio até ao n=8*/
     public static int N_MATRIZES = 4;
+    public static int N_CRITERIOS = 3;
 
     public static String[] v_criterios = new String[4];
     public static String[] v_criterio1 = new String[5];
@@ -32,7 +33,7 @@ public class Projeto_LAPR1 {
     public static double[][] matrizCriterio1 = new double[4][4];
     public static double[][] matrizCriterio2 = new double[4][4];
     public static double[][] matrizCriterio3 = new double[4][4];
-    
+
     public static double[][] matrizSomatorios = new double[4][4];
 
     public static double[][] matrizNormalizadaCriterios = new double[3][4];
@@ -51,7 +52,7 @@ public class Projeto_LAPR1 {
                     System.out.println(nLinhas + " linhas de info relevante lidas");
                     matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, mc_criterios, matrizCriterio1, matrizCriterio2, matrizCriterio3);
                     normalizarMatrizes(matrizSomatorios, matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
-                    System.out.println("5   ");
+                    prioridadeRelativa(matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
                     break;
                 case 2:
                     nLinhas = 0;
@@ -149,18 +150,25 @@ public class Projeto_LAPR1 {
     public static void normalizarMatrizes(double[][] matrizSomatorios, double[][] matrizNormalizadaCriterios, double[][] matrizNormalizada1, double[][] matrizNormalizada2, double[][] matrizNormalizada3) {
         double[][] matrizTemp;
         for (int nMatriz = 0; nMatriz < N_MATRIZES; nMatriz++) {
-            if (nMatriz == 0) {
-                matrizTemp = mc_criterios;
-                matrizNormalizadaCriterios = normalizar(matrizSomatorios, matrizTemp, matrizNormalizadaCriterios, nMatriz);
-            } else if (nMatriz == 1) {
-                matrizTemp = matrizCriterio1;
-                matrizNormalizada1 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada1, nMatriz);
-            } else if (nMatriz == 2) {
-                matrizTemp = matrizCriterio2;
-                matrizNormalizada2 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada2, nMatriz);
-            } else if (nMatriz == 3) {
-                matrizTemp = matrizCriterio3;
-                matrizNormalizada3 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada3, nMatriz);
+            switch (nMatriz) {
+                case 0:
+                    matrizTemp = mc_criterios;
+                    matrizNormalizadaCriterios = normalizar(matrizSomatorios, matrizTemp, matrizNormalizadaCriterios, nMatriz);
+                    break;
+                case 1:
+                    matrizTemp = matrizCriterio1;
+                    matrizNormalizada1 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada1, nMatriz);
+                    break;
+                case 2:
+                    matrizTemp = matrizCriterio2;
+                    matrizNormalizada2 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada2, nMatriz);
+                    break;
+                case 3:
+                    matrizTemp = matrizCriterio3;
+                    matrizNormalizada3 = normalizar(matrizSomatorios, matrizTemp, matrizNormalizada3, nMatriz);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -175,4 +183,43 @@ public class Projeto_LAPR1 {
         return matrizNormalizada;
     }
 
+    public static double[][] prioridadeRelativa(double[][] matrizNormalizadaCriterios, double[][] matrizNormalizada1, double[][] matrizNormalizada2, double[][] matrizNormalizada3) {
+        double[][] mPrioridadeRelativa = new double[N_CRITERIOS + 1][N_MATRIZES];
+        double[][] matrizTemp;
+        for (int nMatriz = 0; nMatriz < N_MATRIZES; nMatriz++) {
+            switch (nMatriz) {
+                case 0:
+                    matrizTemp = matrizNormalizadaCriterios;
+                    matrizNormalizadaCriterios = prioridadeLinhas(matrizTemp);
+                    break;
+                case 1:
+                    matrizTemp = matrizNormalizada1;
+                    matrizNormalizada1 = prioridadeLinhas(matrizTemp);
+                    break;
+                case 2:
+                    matrizTemp = matrizNormalizada2;
+                    matrizNormalizada2 = prioridadeLinhas(matrizTemp);
+                    break;
+                case 3:
+                    matrizTemp = matrizNormalizada3;
+                    matrizNormalizada3 = prioridadeLinhas(matrizTemp);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return mPrioridadeRelativa;
+    }
+
+    public static double[][] prioridadeLinhas(double[][] matriz) {
+        double somaTemp = 0;
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length-1; j++) {
+                somaTemp = somaTemp + matriz[i][j];
+            }
+            matriz[i][matriz.length] = somaTemp / (matriz[i].length-1);
+            somaTemp = 0;
+        }
+        return matriz;
+    }
 }
