@@ -126,6 +126,10 @@ public class Projeto_LAPR1 {
         return nLinhas;
     }
     
+    /**
+     * Dar output a uma matriz pela consola
+     * @param matriz matriz para o Output
+     */
     public static void printMatriz(double[][] matriz){
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
@@ -144,6 +148,11 @@ public class Projeto_LAPR1 {
         }
     }
 
+    /**
+     * Arredondar valores presentes em matrizes
+     * @param matriz matriz que se quer arredondar
+     * @return
+     */
     public static double[][] arredondar(double[][] matriz) {
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
@@ -162,6 +171,11 @@ public class Projeto_LAPR1 {
         return matrizSomatorios;
     }
 
+    /**
+     * Calcular soamtorios
+     * @param matriz matriz chamada
+     * @return
+     */
     public static double[] somatoriosColunas(double[][] matriz) {
         double[] somatorio = new double[matriz.length];
         for (int i = 0; i < matriz.length; i++) {
@@ -197,7 +211,7 @@ public class Projeto_LAPR1 {
             }
         }
     }
-
+    /*Normalizar matrizes*/
     public static double[][] normalizar(double[][] matrizSomatorios, double[][] matriz, double[][] matrizNormalizada, int nMatriz) {
 
         for (int i = 0; i < matriz.length; i++) {
@@ -207,7 +221,7 @@ public class Projeto_LAPR1 {
         }
         return matrizNormalizada;
     }
-
+    /*Calcular prioridade relativa*/
     public static double[][] prioridadeRelativa(double[][] mPrioridadeRelativa, double[][] matrizNormalizadaCriterios, double[][] matrizNormalizada1, double[][] matrizNormalizada2, double[][] matrizNormalizada3) {
         double[][] matrizTemp;
         for (int nMatriz = 0; nMatriz < N_MATRIZES; nMatriz++) {
@@ -235,6 +249,13 @@ public class Projeto_LAPR1 {
         return mPrioridadeRelativa;
     }
 
+    /**
+     * Calcular as prioridades
+     * @param matriz matriz chamada
+     * @param nMatriz flag que identifica a matriz
+     * @param mPrioridadeRelativa matriz das prioridades compostas
+     * @return
+     */
     public static double[][] prioridadeLinhas(double[][] matriz, int nMatriz, double[][] mPrioridadeRelativa) {
         double somaTemp = 0;
         int i, j;
@@ -248,6 +269,12 @@ public class Projeto_LAPR1 {
         return mPrioridadeRelativa;
     }
     
+    /**
+     * Verificar a consistencia das matrizes/INPUT
+     * @param op flag da escolha do utilizador
+     * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
+     * @return
+     */
     public static double[][] verificarConsistencia(int op,double[][] RCValues){
         if(op==1){
             RCValues=RCManualCheck(); 
@@ -258,6 +285,12 @@ public class Projeto_LAPR1 {
         return RCValues;
     }
     /*Verificação da consistencia de forma aproximada*/
+
+    /**
+     * Calcular RC/IR/Valores Próprios de forma aproximada
+     * @return
+     */
+
     public static double[][] RCManualCheck() {
         double[][] cPrioridade;double[][] RCValues = new double[N_MATRIZES][3];
         for (int nMatriz = 0; nMatriz < N_MATRIZES; nMatriz++) {
@@ -289,6 +322,14 @@ public class Projeto_LAPR1 {
         return RCValues;
     }
     
+    /**
+     *
+     * @param matriz matriz chamada
+     * @param cPrioridade coluna onde está guardados os dados das prioridades
+     * @param nMatriz flag que identifica a matriz
+     * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
+     * @return
+     */
     public static double determinarManualRC(double[][] matriz,double[][] cPrioridade, int nMatriz,double[][] RCValues){
         double RC;double lambdaMax=0;double IC,IR;
         lambdaMax=determinarLambdaMax(lambdaMax,matriz,cPrioridade,nMatriz);
@@ -300,7 +341,7 @@ public class Projeto_LAPR1 {
         return RC;
     }
     
-    public static double[][] encontrarColuna(double[][] mPrioridadeRelativa, double[][] cPrioridade, int nMatriz) {
+    private static double[][] encontrarColuna(double[][] mPrioridadeRelativa, double[][] cPrioridade, int nMatriz) {
         if (nMatriz == 0) {
             for (int i = 0; i < mPrioridadeRelativa.length-1; i++) {
                 cPrioridade[i][0] = mPrioridadeRelativa[i][nMatriz];
@@ -313,6 +354,14 @@ public class Projeto_LAPR1 {
         return cPrioridade;
     }
 
+    /**
+     * Determinação do maior valor Proprio
+     * @param lambdaMax variavel que guarda os valor proprio maior
+     * @param matriz matriz que foi chamada
+     * @param cPrioridade coluna em que fica guardada os dados das prioridades
+     * @param nMatriz Flag que identifica a matriz
+     * @return
+     */
     public static double determinarLambdaMax(double lambdaMax,double[][] matriz, double[][] cPrioridade, int nMatriz) {
         double[][] matrizTemp;
         matrizTemp=calcularMultiplicacao(matriz,cPrioridade);
@@ -320,7 +369,7 @@ public class Projeto_LAPR1 {
         return lambdaMax;
     }
     
-    public static double[][] calcularMultiplicacao(double[][] matriz1,double[][] matriz2){
+    private static double[][] calcularMultiplicacao(double[][] matriz1,double[][] matriz2){
         double[][] matrizTemp=new double[matriz1.length][matriz2[0].length];
         for(int i=0;i<matriz1.length;i++){
             for(int j=0;j<matriz2[0].length;j++){
@@ -332,7 +381,7 @@ public class Projeto_LAPR1 {
         return matrizTemp;
     }
     
-    public static double calcularDiv(double[][] matrizTemp,double[][] cPrioridade,double lambdaMax){
+    private static double calcularDiv(double[][] matrizTemp,double[][] cPrioridade,double lambdaMax){
         double somaTemp=0;
         for(int i=0;i<matrizTemp.length;i++){
             somaTemp+=matrizTemp[i][0]/cPrioridade[i][0];
@@ -343,6 +392,11 @@ public class Projeto_LAPR1 {
     /*FIM da Verificação de consistencia por métodos aproximados*/
     
     /*Verificação dos vetores proprios por método exato*/ 
+
+    /**
+     * Calcular RC comvalores Exatos/Eigen Decomposition
+     * @return
+     */
     public static double[][] RCAutoCheck(){
         double[][] RCValues = new double[N_MATRIZES][3];Matrix matriz;
         double[][] matrizValores=null;
@@ -375,6 +429,12 @@ public class Projeto_LAPR1 {
         return RCValues;
     }
     
+    /**
+     * Aplicar Eigen Decomposition
+     * @param matriz matriz que foi chamada
+     * @param matrizValores matriz que guarda os valores próprios
+     * @return
+     */
     public static double[][] decompor(Matrix matriz,double[][] matrizValores){
         EigenDecompositor eigenD=new EigenDecompositor(matriz);
         Matrix[] matrizDecomposta=eigenD.decompose();
@@ -382,6 +442,14 @@ public class Projeto_LAPR1 {
         return matrizValores;
     }
     
+    /**
+     * Determina o maior valor proprio, RC, IR
+     * @param matriz matriz chamada
+     * @param matrizValoresLambda matriz Valores P´rprios
+     * @param nMatriz Flag identificadora da matriz que está a sofrer operações
+     * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
+     * @return
+     */
     public static double determinarAutoRC(double[][] matriz,double[][] matrizValoresLambda,int nMatriz,double[][] RCValues){
         double RC;double lambdaMax=0;double IC,IR;
         lambdaMax=encontrarLambdaMax(matrizValoresLambda,lambdaMax);
@@ -393,6 +461,12 @@ public class Projeto_LAPR1 {
         return RC;
     }
     
+    /**
+     * Percorre a matriz dos valores próprios pelo maior valor
+     * @param matrizValoresLambda matriz Valores Próprios
+     * @param lambdaMax variavel do maior valor próprio
+     * @return
+     */
     public static double encontrarLambdaMax(double[][] matrizValoresLambda,double lambdaMax){
         double valorMaxTemp=matrizValoresLambda[0][0];
         for(int i=0;i<matrizValoresLambda.length;i++){
@@ -407,7 +481,7 @@ public class Projeto_LAPR1 {
     }
     /*FIM da verificação dos vetores por métodos exatos*/
     
-    public static void printMatrizTotalInput(String[][] matrizTotal,int nLinhasOutput){
+    private static void printMatrizTotalInput(String[][] matrizTotal,int nLinhasOutput){
         for(int i=0;i<nLinhasOutput/2;i++){
             for(int j=0;j<matrizTotal[i].length;j++){
                 System.out.printf("%20s", matrizTotal[i][j]);
@@ -417,6 +491,12 @@ public class Projeto_LAPR1 {
         System.out.println(" ");
     }
     
+    /**
+     * HUB do Output : consola e ficheiro
+     * @param op flag da decisao do utilizador
+     * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
+     * @throws FileNotFoundException
+     */
     public static void selecaoOutput(int op,double[][] RCValues) throws FileNotFoundException{
         double escolhas[][];String[][] matrizTotal=new String[100][6];int nLinhasOutput=0;
         nLinhasOutput=juntarDados(matrizTotal,nLinhasOutput,op);
@@ -437,7 +517,11 @@ public class Projeto_LAPR1 {
         guardarOutputTotalTXT(matrizTotal,escolhas,nLinhasOutput,encontrarMelhorEscolha(escolhas),RCValues);
     }
 
-    private static double[][] calcularEscolhas() {
+    /**
+     * Calcular a pontuação de todas as alternativas
+     * @return
+     */
+    public static double[][] calcularEscolhas() {
         double[][] escolhas;
         double[][] matrizPrioridades=new double[mc_criterios.length][1];
         double[][] matrizPrioridadesCriterios=new double[mPrioridadeRelativa.length][mPrioridadeRelativa.length-1];
@@ -453,7 +537,12 @@ public class Projeto_LAPR1 {
         return escolhas;
     }
     
-    private static int encontrarMelhorEscolha(double[][] escolhas){
+    /**
+     * Encontrar a alternativa com maior pontuação
+     * @param escolhas matriz de escolhas
+     * @return
+     */
+    public static int encontrarMelhorEscolha(double[][] escolhas){
         int melhorEscolha=-1;
         double melhorPontuacao=escolhas[0][0];
         for(int i=1;i<escolhas.length;i++){
@@ -465,6 +554,13 @@ public class Projeto_LAPR1 {
         return melhorEscolha;
     }
     
+    /**
+     * Juntar todos os dados lidos e calculados para uma matriz que servirá de Output
+     * @param matrizTotal matriz de dados totais
+     * @param nLinhasOutput numero de linhas usadas para Output
+     * @param op flag de escolha do utilizador
+     * @return
+     */
     public static int juntarDados(String[][] matrizTotal,int nLinhasOutput,int op){
         int nColuna=0;
         nLinhasOutput=adicionarDadosCabecalho(matrizTotal,v_criterios,nLinhasOutput);
@@ -497,7 +593,7 @@ public class Projeto_LAPR1 {
         return nLinhasOutput;
     }
     
-    public static int adicionarDadosCabecalho(String[][] matrizTotal,String[] matriz,int nLinhasOutput){
+    private static int adicionarDadosCabecalho(String[][] matrizTotal,String[] matriz,int nLinhasOutput){
         for(int i=0;i<matriz.length;i++){
                 matrizTotal[nLinhasOutput][i]=matriz[i];
                 matrizTotal[nLinhasOutput+i][0]=matriz[i];
@@ -506,7 +602,7 @@ public class Projeto_LAPR1 {
         return nLinhasOutput;
     }
     
-    public static int adicionarDadosMatrizes(String[][] matrizTotal,String[][] matriz,int nLinhasOutput){
+    private static int adicionarDadosMatrizes(String[][] matrizTotal,String[][] matriz,int nLinhasOutput){
         for(int i=0;i<matriz.length;i++){
             for(int j=0;j<matriz[i].length;j++){
                 matrizTotal[nLinhasOutput][j+1]=matriz[i][j];
@@ -516,7 +612,7 @@ public class Projeto_LAPR1 {
         return nLinhasOutput;
     }
     
-    public static int adicionarVetorPrioridades(String[][] matrizTotal,String[][] matrizPrioridades,int nLinhasOutput,int nColuna){
+    private static int adicionarVetorPrioridades(String[][] matrizTotal,String[][] matrizPrioridades,int nLinhasOutput,int nColuna){
         if(nColuna==0){
             for(int i=0;i<matrizPrioridades.length;i++){
                 if(i==0){
@@ -539,6 +635,12 @@ public class Projeto_LAPR1 {
         return nColuna;
     }
         
+    /**
+     * Converter matriz Double para String
+     * @param matriz Qualquer matriz que seja chamada
+     * @param op flag para identificar a necessidade de arredondar valores
+     * @return
+     */
     public static String[][] DoubleToString(double[][] matriz,int op){
         if(op==1){
             matriz=arredondar(matriz);
@@ -552,6 +654,11 @@ public class Projeto_LAPR1 {
         return matrizConvert;
     }
     
+    /**
+     * Eliminar espaços que sejam null na matriz
+     * @param matrizTotal matriz total de dados
+     * @return
+     */
     public static String[][] eliminarNull(String[][] matrizTotal){
         for(int i=0;i<matrizTotal.length;i++){
             for(int j=0;j<matrizTotal[i].length;j++){
@@ -563,6 +670,15 @@ public class Projeto_LAPR1 {
         return matrizTotal;
     }
     
+    /**
+     * OUTPUT PARA TXT
+     * @param matrizTotal matriz dos dados totais
+     * @param escolhas matriz que guarda os dados das pontuações das escolhas
+     * @param nLinhasOutput quantidade de linhas usadas para o Output
+     * @param melhorEscolha variavel que guarda a melhor escolha
+     * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
+     * @throws FileNotFoundException
+     */
     public static void guardarOutputTotalTXT(String[][] matrizTotal,double[][] escolhas,int nLinhasOutput,int melhorEscolha,double[][] RCValues) throws FileNotFoundException{
         System.out.println("Qual o nome do Output? (ex:DadosOutput.txt)");
         String nomeFich=sc.nextLine();
