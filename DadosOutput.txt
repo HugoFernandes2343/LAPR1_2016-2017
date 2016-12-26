@@ -1,0 +1,62 @@
+        mc_criterios              Estilo      Confiabilidade             Consumo                                        
+              Estilo                 1.0                 0.5                 3.0                                        
+      Confiabilidade                 2.0                 1.0                 4.0                                        
+             Consumo                0.33                0.25                 1.0                                        
+                                                                                                                        
+          mcp_estilo                car1                car2                car3                car4                    
+                car1                 1.0                0.25                 4.0                0.17                    
+                car2                 4.0                 1.0                 4.0                0.25                    
+                car3                0.25                0.25                 1.0                 0.2                    
+                car4                 6.0                 4.0                 5.0                 1.0                    
+                                                                                                                        
+  mcp_confiabilidade                car1                car2                car3                car4                    
+                car1                 1.0                 2.0                 5.0                 1.0                    
+                car2                 0.5                 1.0                 4.0                0.25                    
+                car3                 0.2                0.33                 1.0                0.25                    
+                car4                 1.0                 0.5                 4.0                 1.0                    
+                                                                                                                        
+         mcp_consumo                car1                car2                car3                car4                    
+                car1                 1.0                0.25                 4.0                0.17                    
+                car2                 4.0                 1.0                 4.0                0.25                    
+                car3                0.25                0.25                 1.0                 0.2                    
+                car4                 6.0                 4.0                 5.0                 1.0                    
+                                                                                                                        
+        mc_criterios              Estilo      Confiabilidade             Consumo                     Prioridade Relativa
+              Estilo                 0.3                0.29                0.38                                    0.32
+      Confiabilidade                 0.6                0.57                 0.5                                    0.56
+             Consumo                 0.1                0.14                0.13                                    0.12
+                                                                                                                        
+          mcp_estilo                car1                car2                car3                car4 Prioridade Relativa
+                car1                0.09                0.05                0.29                 0.1                0.13
+                car2                0.36                0.18                0.29                0.15                0.24
+                car3                0.02                0.05                0.07                0.12                0.07
+                car4                0.53                0.73                0.36                0.62                0.56
+                                                                                                                        
+  mcp_confiabilidade                car1                car2                car3                car4 Prioridade Relativa
+                car1                0.37                0.52                0.36                 0.4                0.41
+                car2                0.19                0.26                0.29                 0.1                0.21
+                car3                0.07                0.09                0.07                 0.1                0.08
+                car4                0.37                0.13                0.29                 0.4                 0.3
+                                                                                                                        
+         mcp_consumo                car1                car2                car3                car4 Prioridade Relativa
+                car1                0.09                0.05                0.29                 0.1                0.13
+                car2                0.36                0.18                0.29                0.15                0.24
+                car3                0.02                0.05                0.07                0.12                0.07
+                car4                0.53                0.73                0.36                0.62                0.56
+                       RC        Valor Próprio Máx                       IR
+                1 : 0.016                1 : 3.018                 1 : 0.58
+                2 : 0.171                2 : 4.462                  2 : 0.9
+               3 : -0.068                3 : 3.816                  3 : 0.9
+                4 : 0.171                4 : 4.462                  4 : 0.9
+ Prioridade Composta
+              | 0.13              | 0.41              | 0.13
+              | 0.24              | 0.21              | 0.24
+              | 0.07              | 0.08              | 0.07
+              | 0.56               | 0.3              | 0.56
+     Pontuação Final
+ Alternativa 1: 0.29
+ Alternativa 2: 0.22
+ Alternativa 3: 0.08
+ Alternativa 4: 0.41
+
+A melhor alternativa é a alternativa: 4
