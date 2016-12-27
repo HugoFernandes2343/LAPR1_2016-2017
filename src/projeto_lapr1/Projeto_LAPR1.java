@@ -45,27 +45,27 @@ public class Projeto_LAPR1 {
     public static double[][] matrizNormalizada3 = new double[N_OBJETOS][N_OBJETOS];
 
     public static void main(String[] args) throws FileNotFoundException {
-        int nLinhas, op;double[][] RCValues=null;
+        int nLinhas, op;double[][] RCValues=null;String Input=args[0];String Output = args[1];
         do {
             op = menu();
             switch (op) {
                 case 1:
                     nLinhas = 0;
-                    nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
+                    nLinhas = LerFicheiroInput(Input,nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
                     System.out.println(nLinhas + " linhas de info relevante lidas");
                     matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, mc_criterios, matrizCriterio1, matrizCriterio2, matrizCriterio3);
                     normalizarMatrizes(matrizSomatorios, matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
                     mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
-                    RCValues=verificarConsistencia(op,RCValues);selecaoOutput(op,RCValues);
+                    RCValues=verificarConsistencia(op,RCValues);selecaoOutput(Output,op,RCValues);
                     break;
                 case 2:
                     nLinhas = 0;
-                    nLinhas = LerFicheiroInput(nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
+                    nLinhas = LerFicheiroInput(Input,nLinhas, v_criterios, mc_criterios, v_criterio1, matrizCriterio1, v_criterio2, matrizCriterio2, v_criterio3, matrizCriterio3);
                     System.out.println(nLinhas + " linhas de info relevante lidas");
                     matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, mc_criterios, matrizCriterio1, matrizCriterio2, matrizCriterio3);
                     normalizarMatrizes(matrizSomatorios, matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
                     mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizNormalizadaCriterios, matrizNormalizada1, matrizNormalizada2, matrizNormalizada3);
-                    RCValues=verificarConsistencia(op,RCValues);selecaoOutput(op,RCValues);
+                    RCValues=verificarConsistencia(op,RCValues);selecaoOutput(Output,op,RCValues);
                     break;
                 case 0:
                     break;
@@ -88,9 +88,10 @@ public class Projeto_LAPR1 {
         return op;
     }
 
-    public static int LerFicheiroInput(int nLinhas, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3) throws FileNotFoundException {
-        /*Formatter ler = new Formatter(new File("Dados.txt"));*/
-        Scanner readFile = new Scanner(new File("Dados.txt"));
+    public static int LerFicheiroInput(String Input,int nLinhas, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3) throws FileNotFoundException {
+        /*System.out.println("Qual o nome do Input? (ex:DadosInput.txt)");
+        String nomeFich=sc.nextLine();*/
+        Scanner readFile = new Scanner(new File(Input));
         while (readFile.hasNext()) {
             String linhaDados = readFile.nextLine();
             if (linhaDados.length() > 0) {
@@ -497,16 +498,16 @@ public class Projeto_LAPR1 {
      * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
      * @throws FileNotFoundException
      */
-    public static void selecaoOutput(int op,double[][] RCValues) throws FileNotFoundException{
+    public static void selecaoOutput(String Output,int op,double[][] RCValues) throws FileNotFoundException{
         double escolhas[][];String[][] matrizTotal=new String[100][6];int nLinhasOutput=0;
         nLinhasOutput=juntarDados(matrizTotal,nLinhasOutput,op);
         matrizTotal=eliminarNull(matrizTotal);
         printMatrizTotalInput(matrizTotal,nLinhasOutput);
         for(int i=0;i<RCValues.length;i++){
             if(RCValues[i][0]>0.1){
-                System.out.println("Os valores das prioridades relativas da "+(i+1)+"ªmatriz inserida no input não são consistentes, RC:"+RCValues[i]);
+                System.out.println("Os valores das prioridades relativas da "+(i+1)+"ªmatriz inserida no input não são consistentes, RC:"+RCValues[i][0]);
             }else if(RCValues[i][0]<=0.1){
-                System.out.println("Os valores das prioridades relativas da "+(i+1)+"ªmatriz inserida no input são consistentes, RC:"+RCValues[i]);
+                System.out.println("Os valores das prioridades relativas da "+(i+1)+"ªmatriz inserida no input são consistentes, RC:"+RCValues[i][0]);
             }
         }
         escolhas=calcularEscolhas();
@@ -514,7 +515,7 @@ public class Projeto_LAPR1 {
         System.out.println("Escolhas:");
         printMatriz(escolhas);
         System.out.println("A melhor alternativa segundo os critérios é a alternativa "+encontrarMelhorEscolha(escolhas));
-        guardarOutputTotalTXT(matrizTotal,escolhas,nLinhasOutput,encontrarMelhorEscolha(escolhas),RCValues);
+        guardarOutputTotalTXT(Output,matrizTotal,escolhas,nLinhasOutput,encontrarMelhorEscolha(escolhas),RCValues);
     }
 
     /**
@@ -679,10 +680,10 @@ public class Projeto_LAPR1 {
      * @param RCValues matriz de dados que aloja na primeira coluna os valores do RC, na segunda o maior valor p´roprio e na terceira o IR
      * @throws FileNotFoundException
      */
-    public static void guardarOutputTotalTXT(String[][] matrizTotal,double[][] escolhas,int nLinhasOutput,int melhorEscolha,double[][] RCValues) throws FileNotFoundException{
-        System.out.println("Qual o nome do Output? (ex:DadosOutput.txt)");
-        String nomeFich=sc.nextLine();
-        Formatter out = new Formatter(new File(nomeFich));
+    public static void guardarOutputTotalTXT(String Output,String[][] matrizTotal,double[][] escolhas,int nLinhasOutput,int melhorEscolha,double[][] RCValues) throws FileNotFoundException{
+        /*System.out.println("Qual o nome do Output? (ex:DadosOutput.txt)");
+        String nomeFich=sc.nextLine();*/
+        Formatter out = new Formatter(new File(Output));
         for (int i = 0; i < nLinhasOutput; i++) {          
             for (int j = 0; j < matrizTotal[i].length; j++) {
                 out.format("%20s", matrizTotal[i][j]);
