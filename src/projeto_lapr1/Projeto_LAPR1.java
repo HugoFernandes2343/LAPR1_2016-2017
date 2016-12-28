@@ -544,7 +544,7 @@ public class Projeto_LAPR1 {
      * @return
      */
     public static int encontrarMelhorEscolha(double[][] escolhas){
-        int melhorEscolha=-1;
+        int melhorEscolha=1;
         double melhorPontuacao=escolhas[0][0];
         for(int i=1;i<escolhas.length;i++){
             if(escolhas[i][0]>melhorPontuacao){
