@@ -103,7 +103,7 @@ public class Projeto_LAPR1 {
     }
 
     public static int tratarInput(String linhaDados, String[] v_criterios, double[][] mc_criterios, String[] v_criterio1, double[][] matrizCriterio1, String[] v_criterio2, double[][] matrizCriterio2, String[] v_criterio3, double[][] matrizCriterio3, int nLinhas) {
-        String temp[] = linhaDados.split(" ");/*Split testes*/
+        String temp[] = linhaDados.split(" +");// " +" Split por numero arbitrario de espaços
         for (int j = 0; j < temp.length; j++) {
             if (nLinhas == 0) {
                 v_criterios[j] = temp[j];
