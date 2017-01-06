@@ -17,10 +17,11 @@ public class MetodoAHP {
 
     public static Scanner sc = new Scanner(System.in);
     public static double[] RandomConsistency = {0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.42};/*Vetor Randômio até ao n=8*/
+    public static int N_CRITERIOS,N_ALTERNATIVAS;
 
     public static void main(String args[]/*int DecisaoLimiar e input e output*/) throws FileNotFoundException {
         String Input = "DadosInputAHP.txt",Output;
-        String[][] matrizTotalInput = new String[50][100],m_cabecalhos=null;int N_CRITERIOS,N_ALTERNATIVAS,nLinhas,op;
+        String[][] matrizTotalInput = new String[50][100],m_cabecalhos=null;int nLinhas,op;
         double[][] matrizTotalCriterios=null,matrizSomatorios=null,matrizCriterios=null,matrizCriteriosNormalizada=null,matrizTotalNormalizacao=null,mPrioridadeRelativa=null,RCValues = null;
         do {
             op = menu();
@@ -38,7 +39,7 @@ public class MetodoAHP {
                     matrizCriteriosNormalizada=normalizar(matrizSomatorios,matrizCriterios,matrizCriteriosNormalizada,0);
                     matrizTotalNormalizacao=normalizarMatrizes(matrizSomatorios,matrizTotalCriterios,matrizCriterios,matrizCriteriosNormalizada,matrizTotalNormalizacao,N_CRITERIOS,N_ALTERNATIVAS);
                     mPrioridadeRelativa=prioridadeRelativa(mPrioridadeRelativa,matrizCriteriosNormalizada,matrizTotalNormalizacao,N_CRITERIOS,N_ALTERNATIVAS);
-                    /*RCValues=verificarConsistencia(op,RCValues);*/
+                    RCValues=verificarConsistencia(op,RCValues,mPrioridadeRelativa,matrizCriterios,matrizTotalCriterios);
                     break;
                 case 2:
                     nLinhas = 0;
@@ -233,9 +234,9 @@ public class MetodoAHP {
         return mPrioridadeRelativa;
     }
     
-    public static double[][] verificarConsistencia(int op,double[][] RCValues,int N_ALTERNATIVAS){
+    public static double[][] verificarConsistencia(int op,double[][] RCValues,double[][] mPrioridadeRelativa,double[][] matrizCriterios,double[][] matrizTotalCriterios){
         if(op==1){
-            RCValues=RCManualCheck(); 
+            RCValues=RCManualCheck(mPrioridadeRelativa,matrizCriterios,matrizTotalCriterios); 
         }else if(op==2){
             /*RCValues=RCAutoCheck();*/
         }
@@ -243,19 +244,34 @@ public class MetodoAHP {
         return RCValues;
     }
     
-    public static double[][] RCManualCheck() {
-        double[][] cPrioridade;double[][] RCValues = new double[N_MATRIZES][3];
-        for (int nMatriz = 0; nMatriz < N_MATRIZES; nMatriz++) {
+    public static double[][] RCManualCheck(double[][] mPrioridadeRelativa,double[][] matrizCriterios,double[][] matrizTotalCriterios) {
+        double[][] cPrioridade;double[][] RCValues = new double[N_CRITERIOS+1][3];//RCValues[][3], o 3 refere-se ao numero de colunas: RC,Valor Proprio,IR
+        for (int nMatriz = 0; nMatriz < N_CRITERIOS+1; nMatriz++) {
             if(nMatriz==0){       
-                    cPrioridade = new double[mc_criterios.length][1];
+                    cPrioridade = new double[N_CRITERIOS][1];
                     cPrioridade = encontrarColuna(mPrioridadeRelativa, cPrioridade, nMatriz);
-                    RCValues[nMatriz][0] = determinarManualRC(mc_criterios, cPrioridade, nMatriz,RCValues);
-                    break;
+                    RCValues[nMatriz][0] = determinarManualRC(matrizCriterios, cPrioridade, nMatriz,RCValues);
             }else{
-                            
-            }
-            }
+                    cPrioridade = new double[N_ALTERNATIVAS][1];
+                    cPrioridade = encontrarColuna(mPrioridadeRelativa, cPrioridade, nMatriz);
+                    RCValues[nMatriz][0] = determinarManualRC(identificarMatriz(matrizTotalCriterios,nMatriz,N_ALTERNATIVAS), cPrioridade, nMatriz,RCValues);        
+            }          
         }
         return RCValues;
     }
+
+    private static double[][] encontrarColuna(double[][] mPrioridadeRelativa, double[][] cPrioridade, int nMatriz) {
+        if (nMatriz == 0) {
+            for (int i = 0; i < mPrioridadeRelativa.length-1; i++) {
+                cPrioridade[i][0] = mPrioridadeRelativa[i][nMatriz];
+            }
+        } else if (nMatriz != 0) {
+            for (int i = 0; i < mPrioridadeRelativa.length; i++) {
+                cPrioridade[i][0] = mPrioridadeRelativa[i][nMatriz];
+            }
+        }
+        return cPrioridade;
+    }
+    
+    
 }
