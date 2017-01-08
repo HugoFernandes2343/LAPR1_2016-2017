@@ -14,14 +14,15 @@ public class ProjetoLAPR1_Iteracao2 {
     public static void main(String[] args) throws FileNotFoundException {
         String metodo = args[0];
         if(metodo.equals("-M1")){
-            String limiar=args[1];
-            String Input=args[2];
-            String Output=args[3];
-            MetodoAHP.main(lerLimiar(limiar),Input,Output);
+            double limiarCriterio=lerLimiar(args[1]);
+            double limiarRC=lerLimiar(args[2]);
+            String Input=args[3];
+            String Output=args[4];
+            MetodoAHP.main(limiarCriterio,limiarRC,Input,Output);
         }else if(metodo.equals("-M2")){
             String Input=args[1];
             String Output=args[2];
-            MetodoTOPSIS.main(Input,Output);/*Só no final do code é que se implementa
+            MetodoTOPSIS.main(Input,Output);/*Só no final do code é que se implementa*/
         }
     }
     
