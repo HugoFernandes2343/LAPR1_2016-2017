@@ -1,9 +1,10 @@
-
 package PackageTestes;
 
 import org.la4j.Matrix;
 import org.la4j.decomposition.EigenDecompositor;
 import org.la4j.matrix.dense.Basic2DMatrix;
+import projetolapr1_iteracao2.MetodoAHP;
+import projetolapr1_iteracao2.MetodoTOPSIS;
 
 /**
  *
@@ -35,18 +36,10 @@ public class Testes {
     public static void arredondar_teste() {
         double[][] matriz={{1.5678,2.4355},{12.4567,45.4556}};
         System.out.println("Arredondar (com duas casas decimais):");
-        for(int i=0;i<matriz.length;i++){
-            for(int j=0;j<matriz[i].length;j++){
-                System.out.printf("%20s",matriz[i][j]);
-            }
-            System.out.println("");
-        }
+        MetodoAHP.arredondar(matriz);
+        System.out.println("");
         System.out.println("Resultado esperado : {1.57,2.44},{12.46,45.46}");
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
-                matriz[i][j] = (double) Math.round(matriz[i][j] * 100) / 100;
-            }
-        }
+        System.out.println("");
         for(int i=0;i<matriz.length;i++){
             for(int j=0;j<matriz[i].length;j++){
                 System.out.printf("%20s",matriz[i][j]);
@@ -58,22 +51,16 @@ public class Testes {
     public static void StringToDouble_teste(){
         System.out.println("Tansformar 2/5 em 0.4");
         String valor="2/5";
-        if (valor.contains("/")) {
-            String[] tempDiv = valor.split("/");
-            System.out.println(Double.parseDouble(tempDiv[0]) / Double.parseDouble(tempDiv[1]));
-        }
+        System.out.println(MetodoAHP.StringToDouble(valor));
     }
     
     /*Testar Eigen Decomposition*/
     public static void decomporMatriz_teste(){
         System.out.println("Matriz : {1,2,3},{1,2,3},{1,2,3}");
         System.out.println("Resultado esperado (aproximadamente),Lambda Máximo = 6");
-        double[][] matrizValores;
         double[][] matrizDados={{1,2,3},{1,2,3},{1,2,3}};
         Matrix matriz =new Basic2DMatrix(matrizDados);
-        EigenDecompositor eigenD=new EigenDecompositor(matriz);
-        Matrix[] matrizDecomposta=eigenD.decompose();
-        matrizValores=matrizDecomposta[1].toDenseMatrix().toArray();
+        double[][] matrizValores=MetodoAHP.decompor(matriz, matrizDados);
         for(int i=0;i<matrizValores.length;i++){
             for(int j=0;j<matrizValores[i].length;j++){
                 System.out.printf("%20s",matrizValores[i][j]);

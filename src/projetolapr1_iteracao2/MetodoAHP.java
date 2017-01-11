@@ -2,6 +2,8 @@ package projetolapr1_iteracao2;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Formatter;
 import java.util.Scanner;
 import org.la4j.Matrix;
@@ -14,37 +16,42 @@ public class MetodoAHP {
     public static Scanner sc = new Scanner(System.in);
     public static double[] RandomConsistency = {0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.42};/*Vetor Randômio até ao n=8*/
     public static int N_CRITERIOS, N_ALTERNATIVAS;
-    private final static String FILE_LOG_ERROS = "ErrosAHP.txt";
+    public static Calendar Data = Calendar.getInstance();
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd_MM_yyyy HH.mm.ss");/*Windows nao permite : como caracter*/
+    private static final String FILE_LOG_ERROS = SDF.format(Data.getTime()) + ".txt";
+    public static String[] posicaoDadosIrrelevantes;
+    public static String[][] matrizTotalInput = new String[50][100], m_cabecalhos = null;
+    public static double[][] matrizTotalCriterios = null, matrizSomatorios = null, matrizCriterios = null, matrizCriteriosNormalizada = null, matrizTotalNormalizacao = null, mPrioridadeRelativa = null, RCValues = null;
 
-    public static void main(String[] args/*,double limiarCriterio,double limiarRC,String Input,String Output*/) throws FileNotFoundException {
-        String Input = "DadosInputAHP.txt", Output = "DadosOutputAHPIt2.txt";
-        String[][] matrizTotalInput = new String[50][100], m_cabecalhos = null;
+    public static void main(/*String[] args*/double limiarCriterio,double limiarRC,String Input,String Output) throws FileNotFoundException {
+        //String Input = "DadosInputAHP.txt", Output = "DadosOutputAHPIt2.txt";
+        /*String[][] matrizTotalInput = new String[50][100], m_cabecalhos = null;*/
         int nLinhas, op;
-        double limiarCriterio = 0.3,limiarRC=0.05;//Exemplo
-        double[][] matrizTotalCriterios = null, matrizSomatorios = null, matrizCriterios = null, matrizCriteriosNormalizada = null, matrizTotalNormalizacao = null, mPrioridadeRelativa = null, RCValues = null;
+        //double limiarCriterio = 0.2, limiarRC = 0.05;//Exemplo
+        Formatter logErros = new Formatter(new File(FILE_LOG_ERROS));
         do {
             op = menu();
             nLinhas = 0;
-            nLinhas = LerFicheiroInput(Input, nLinhas, matrizTotalInput);
-            System.out.println(nLinhas + " linhas de info relevante lidas");
+            nLinhas = LerFicheiroInput(Input, nLinhas, matrizTotalInput, logErros);
+            System.out.println(nLinhas + " linhas de info lidas");
             N_CRITERIOS = encontrarNELEMENTOS(matrizTotalInput[0]);
             N_ALTERNATIVAS = encontrarNELEMENTOS(matrizTotalInput[N_CRITERIOS + 1]);
-            matrizCriterios = criarMatrizCriterios(matrizTotalInput, matrizCriterios, N_CRITERIOS);
+            matrizCriterios = criarMatrizCriterios(matrizTotalInput, matrizCriterios, N_CRITERIOS,logErros);
             m_cabecalhos = criarMatrizCabecalhos(matrizTotalInput, matrizCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos);
-            matrizTotalCriterios = criarMatrizTotalCriterios(matrizTotalInput, matrizCriterios, matrizTotalCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos);
-            //N_CRITERIOS = verificacaoLimiar(limiarCriterio, matrizCriterios, m_cabecalhos, matrizTotalCriterios);
+            matrizTotalCriterios = criarMatrizTotalCriterios(matrizTotalInput, matrizCriterios, matrizTotalCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos,logErros);
             matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, matrizCriterios, matrizTotalCriterios, N_ALTERNATIVAS, N_CRITERIOS);
             matrizCriteriosNormalizada = normalizar(matrizSomatorios, matrizCriterios, matrizCriteriosNormalizada, 0);
             matrizTotalNormalizacao = normalizarMatrizes(matrizSomatorios, matrizTotalCriterios, matrizCriterios, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
             mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
+
             switch (op) {
                 case 1:
                     RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
-                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa,limiarRC);
+                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio);
                     break;
                 case 2:
                     RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
-                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa,limiarRC);
+                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio);
                     break;
                 case 0:
                     break;
@@ -67,15 +74,22 @@ public class MetodoAHP {
         return op;
     }
 
-    public static int LerFicheiroInput(String Input, int nLinhas, String[][] matrizTotalInput) throws FileNotFoundException {
-        Scanner readFile = new Scanner(new File(Input));
-        while (readFile.hasNext()) {
-            String linhaDados = readFile.nextLine();
-            if (linhaDados.length() > 0) {
-                nLinhas = tratarInput(linhaDados, nLinhas, matrizTotalInput);
+    public static int LerFicheiroInput(String Input, int nLinhas, String[][] matrizTotalInput, Formatter log) throws FileNotFoundException {
+        try (Scanner readFile = new Scanner(new File(Input))) {
+            while (readFile.hasNext()) {
+                String linhaDados = readFile.nextLine();
+                if (linhaDados.length() > 0) {
+                    nLinhas = tratarInput(linhaDados, nLinhas, matrizTotalInput);
+                }
             }
+        } catch (FileNotFoundException erro) {
+            log.format("Erro encontrado: ");
+            log.format(erro.getMessage());
+            System.err.println("Erro encontrado: " + erro.getMessage());//.getMessage vai buscar a detailedMessage da Exception
+            log.close();
+            System.exit(0);//.exit usas-se 0 porque é suposto darmos a execução como bem sucedida apesar do ficheiro nao ser encontrado, senao usamos valor 1
+            throw erro;
         }
-        readFile.close();
         return nLinhas;
     }
 
@@ -107,24 +121,38 @@ public class MetodoAHP {
         }
     }
 
-    public static double[][] criarMatrizCriterios(String[][] matrizInputTotal, double[][] matrizCriterios, int N_CRITERIOS) {
+    public static double[][] criarMatrizCriterios(String[][] matrizInputTotal, double[][] matrizCriterios, int N_CRITERIOS,Formatter log) {
         matrizCriterios = new double[N_CRITERIOS][N_CRITERIOS];
         for (int i = 0; i < matrizCriterios.length; i++) {
             for (int j = 0; j < matrizCriterios[i].length; j++) {
-                matrizCriterios[i][j] = StringToDouble(matrizInputTotal[i + 1][j]);
+                if (matrizInputTotal[i + 1][j].contains(".") || matrizInputTotal[i + 1][j].contains(",")) {
+                    log.format("Formato errado (Posicao ("+(i+1)+","+(j+1)+")): ",matrizInputTotal[i + 1][j]);
+                    System.out.println("Erro detetado, verificar Log");
+                    log.close();
+                    System.exit(0);
+                } else {
+                    matrizCriterios[i][j] = StringToDouble(matrizInputTotal[i + 1][j]);
+                }
             }
         }
         return matrizCriterios;
     }
 
-    public static double[][] criarMatrizTotalCriterios(String[][] matrizInputTotal, double[][] matrizCriterios, double[][] matrizTotalCriterios, int N_CRITERIOS, int N_ALTERNATIVAS, int nLinhas, String[][] m_cabecalhos) {
+    public static double[][] criarMatrizTotalCriterios(String[][] matrizInputTotal, double[][] matrizCriterios, double[][] matrizTotalCriterios, int N_CRITERIOS, int N_ALTERNATIVAS, int nLinhas, String[][] m_cabecalhos,Formatter log) {
         matrizTotalCriterios = new double[N_CRITERIOS * N_ALTERNATIVAS][N_ALTERNATIVAS];
-        int c = 0, p = 0, i = 0, j, k;
+        int c = 0, j, k;
         m_cabecalhos = new String[N_CRITERIOS][N_ALTERNATIVAS + 1];
         for (j = 0; j < matrizTotalCriterios.length + matrizCriterios.length; j++) {
             if (matrizInputTotal[j + (matrizCriterios.length + 1)][0].contains("mc") != true) {
                 for (k = 0; k < matrizTotalCriterios[c].length; k++) {
-                    matrizTotalCriterios[c][k] = StringToDouble(matrizInputTotal[j + (matrizCriterios.length + 1)][k]);
+                    if (matrizInputTotal[j + (matrizCriterios.length + 1)][k].contains(".") || matrizInputTotal[j + (matrizCriterios.length + 1)][k].contains(",")) {
+                        log.format("Formato errado (Posicao ("+(j+(matrizCriterios.length + 1)+1)+","+(k+1)+")): ",matrizInputTotal[j + 1][k]);
+                        System.out.println("Erro detetado, verificar Log");
+                        log.close();
+                        System.exit(0);
+                    } else {
+                        matrizTotalCriterios[c][k] = StringToDouble(matrizInputTotal[j + (matrizCriterios.length + 1)][k]);
+                    }
                 }
                 c++;
             }
@@ -146,54 +174,13 @@ public class MetodoAHP {
         return m_cabecalhos;
     }
 
-    private static double StringToDouble(String N) {
+    public static double StringToDouble(String N) {
         if (N.contains("/")) {
             String[] tempDiv = N.split("/");
             return Double.parseDouble(tempDiv[0]) / Double.parseDouble(tempDiv[1]);
         } else {
             return Double.parseDouble(N);
         }
-    }
-
-    public static int verificacaoLimiar(double limiar, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios) {
-        int posicao;
-        for (int i = 0; i < matrizCriterios.length; i++) {
-            for (int j = 0; j < matrizCriterios[i].length; j++) {
-                if (matrizCriterios[i][j] < limiar) {
-                    posicao = i;
-                    matrizCriterios = atualizarMatrizesLimiar(posicao, matrizCriterios, m_cabecalhos, matrizTotalCriterios);
-                }
-            }
-        }
-        return N_CRITERIOS;
-    }
-
-    public static double[][] atualizarMatrizesLimiar(int posicao, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios) {
-        double[][] matrizDadosIrrelevantesPesos = new double[N_CRITERIOS][N_CRITERIOS], matrizDadosIrrelevantesCriterios = new double[matrizTotalCriterios.length][matrizTotalCriterios[0].length];
-        String[] matrizDadosIrrelevantesCabecalhoPesos = new String[N_CRITERIOS];
-        String[][] m_cabecalhosTemp = m_cabecalhos;
-        double[][] matrizTotalCriteriosTemp = matrizTotalCriterios;
-
-        matrizDadosIrrelevantesCabecalhoPesos[posicao] = m_cabecalhos[0][posicao + 1];
-        
-        matrizDadosIrrelevantesPesos[posicao] = matrizCriterios[posicao];
-        for (int i = 0; i < matrizDadosIrrelevantesPesos.length; i++) {
-            matrizDadosIrrelevantesPesos[i][posicao] = matrizCriterios[i][posicao];
-        }
-        matrizCriterios=atualizarMatrizCriterios(matrizCriterios,posicao);
-        
-        return matrizCriterios;
-    }
-    
-    public static double[][] atualizarMatrizCriterios(double[][] matrizCriterios,int posicao){
-        double[][] matrizCriteriosTemp = matrizCriterios;
-        matrizCriterios = new double[N_CRITERIOS - 1][N_CRITERIOS - 1];
-        for (int i = 0; i < matrizCriterios.length; i++) {
-            for (int j = 0; j < matrizCriterios.length; j++) {
-                //Colocar as posiçoes no sitio correto        
-            }
-        }
-        return matrizCriterios;
     }
 
     public static double[][] criarMatrizSomatorios(double[][] matrizSomatorios, double[][] matrizCriterios, double[][] matrizTotalCriterios, int N_ALTERNATIVAS, int N_CRITERIOS) {
@@ -409,7 +396,7 @@ public class MetodoAHP {
         return lambdaMax;
     }
 
-    public static void selecaoOutput(String Output, int op, double[][] RCValues, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa,double limiarRC) throws FileNotFoundException {
+    public static void selecaoOutput(String Output, int op, double[][] RCValues, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa, double limiarRC, double limiarCriterio) throws FileNotFoundException {
         double escolhas[][];
         String[][] matrizTotal = new String[100][100];
         int nLinhasOutput = 0;
@@ -423,7 +410,7 @@ public class MetodoAHP {
                 System.out.println("Os valores das prioridades relativas da " + (i + 1) + "ªmatriz inserida no input são consistentes, RC:" + RCValues[i][0]);
             }
         }
-        escolhas = calcularEscolhas(matrizCriterios, mPrioridadeRelativa);
+        escolhas = calcularEscolhas(matrizCriterios, mPrioridadeRelativa, limiarCriterio, m_cabecalhos);
         System.out.println(" ");
         System.out.println("Escolhas:");
         printMatriz(escolhas);
@@ -545,20 +532,62 @@ public class MetodoAHP {
         System.out.println(" ");
     }
 
-    public static double[][] calcularEscolhas(double[][] matrizCriterios, double[][] mPrioridadeRelativa) {
-        double[][] escolhas;
-        double[][] matrizPrioridades = new double[matrizCriterios.length][1];
-        double[][] matrizPrioridadesCriterios = new double[mPrioridadeRelativa.length][mPrioridadeRelativa.length - 1];
-        for (int i = 0; i < matrizCriterios.length; i++) {
-            matrizPrioridades[i][0] = mPrioridadeRelativa[i][0];
+    public static double[][] calcularEscolhas(double[][] matrizCriterios, double[][] mPrioridadeRelativa, double limiarCriterio, String[][] m_cabecalhos) {
+        int[] posicao = new int[N_CRITERIOS];
+        int contPos = 0, NCriteriosIrrelevantes = 0, c = 0;
+        posicao = verificacaoLimiar(mPrioridadeRelativa, limiarCriterio, posicao);
+        posicaoDadosIrrelevantes = new String[posicao.length];
+        NCriteriosIrrelevantes = recontagemCriterios(NCriteriosIrrelevantes, posicao);
+        double[][] matrizPrioridades = new double[matrizCriterios.length - NCriteriosIrrelevantes][1], escolhas;
+        for (int i = 0; i < matrizPrioridades.length; i++) {
+            if (posicao[i] != 1) {
+                matrizPrioridades[contPos][0] = mPrioridadeRelativa[i][0];
+                contPos++;
+            }
         }
+        System.out.println(" ");
+        System.out.println("Os atributos eliminados são:");
+        for (int k = 0; k < posicao.length; k++) {
+            if (posicao[k] == 1) {
+                c++;
+                System.out.println(m_cabecalhos[0][k + 1]);
+                posicaoDadosIrrelevantes[c] = m_cabecalhos[0][k + 1];
+            }
+        }
+        contPos = 1;
+        c = 0;
+        double[][] matrizPrioridadesCriterios = new double[mPrioridadeRelativa.length][mPrioridadeRelativa.length - 1 - NCriteriosIrrelevantes];
         for (int i = 0; i < matrizPrioridadesCriterios.length; i++) {
             for (int j = 1; j < matrizPrioridadesCriterios[i].length + 1; j++) {
-                matrizPrioridadesCriterios[i][j - 1] = mPrioridadeRelativa[i][j];
+                c++;
+                if (posicao[c - 1] != 1) {
+                    matrizPrioridadesCriterios[i][contPos - 1] = mPrioridadeRelativa[i][j];
+                    contPos++;
+                }
             }
+            contPos = 1;
+            c = 0;
         }
         escolhas = calcularMultiplicacao(matrizPrioridadesCriterios, matrizPrioridades);
         return escolhas;
+    }
+
+    public static int[] verificacaoLimiar(double[][] mPrioridadeRelativa, double limiarCriterio, int[] posicao) {
+        for (int i = 0; i < posicao.length; i++) {
+            if (mPrioridadeRelativa[i][0] < limiarCriterio) {
+                posicao[i] = 1;
+            }
+        }
+        return posicao;
+    }
+
+    public static int recontagemCriterios(int NCriteriosIrrelevantes, int[] posicao) {
+        for (int i = 0; i < posicao.length; i++) {
+            if (posicao[i] != 0) {
+                NCriteriosIrrelevantes++;
+            }
+        }
+        return NCriteriosIrrelevantes;
     }
 
     public static int encontrarMelhorEscolha(double[][] escolhas) {
@@ -581,6 +610,14 @@ public class MetodoAHP {
             }
             out.format("%n");
         }
+        out.format("%25s", "Atributos Ignorados:");
+        out.format("%n");
+        for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
+            if (posicaoDadosIrrelevantes[i] != null) {
+                out.format("%25s", posicaoDadosIrrelevantes[i]);
+            }
+        }
+        out.format("%n");
         out.format("%25s", "RC");
         out.format("%25s", "Valor Próprio Máx");
         out.format("%25s", "IR");
@@ -591,7 +628,7 @@ public class MetodoAHP {
             }
             out.format("%n");
         }
-
+        out.format("%n");
         out.format("%20s", "Prioridade Composta");
         out.format("%n");
 
