@@ -18,17 +18,10 @@ public class MetodoTOPSIS {
      */
     public static void main(String[] args) throws FileNotFoundException {
         double[] pesos;
-        double[][] MC;
-        double[][] MNorm;
-        double[][] matrizSolucao;
-        double[][] matrizSeparadaIdealP;
-        double[][] matrizSeparadaIdealN;
+        double[][] MC, MNorm, matrizSolucao, matrizSeparadaIdealP, matrizSeparadaIdealN;
         String[][] totalInput = new String[50][50];
         String nomeFich = "inputTOPSIS.txt";
-        String[] beneficios;
-        String[] custos;
-        String[] criterios;
-        String[] alternativas;
+        String[] beneficios, custos, criterios, alternativas;
         int nLinhas = 0, nElementos = 0;
 
         nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
@@ -139,14 +132,14 @@ public class MetodoTOPSIS {
         double ideal, idealNEG;
         for (int i = 0; i < MNorm.length; i++) {
             ideal = 0;
-            idealNEG = 0;
+            idealNEG = 100000;
             for (int j = 0; j < MNorm.length; j++) {
 
                 if (ideal < MNorm[i][j]) {
                     matrizSolucao[0][i] = MNorm[i][j];
                     ideal = MNorm[i][j];
                 }
-                if (idealNEG < MNorm[i][j]) {
+                if (idealNEG > MNorm[i][j]) {
                     matrizSolucao[1][i] = MNorm[i][j];
                     idealNEG = MNorm[i][j];
 
@@ -173,7 +166,7 @@ public class MetodoTOPSIS {
 
         for (int i = 0; i < matrizSeparadaIdealN.length; i++) {
             for (int j = 0; j < matrizSeparadaIdealN.length; j++) {
-                matrizSeparadaIdealN[i][j] = Math.sqrt(Math.pow(MNorm[i][j] - matrizSolucao[1][i],2));
+                matrizSeparadaIdealN[i][j] = Math.sqrt(Math.pow(MNorm[i][j] - matrizSolucao[1][i], 2));
             }
         }
         return matrizSeparadaIdealN;
