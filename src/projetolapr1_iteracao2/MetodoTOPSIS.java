@@ -18,17 +18,10 @@ public class MetodoTOPSIS {
      */
     public static void main(String[] args) throws FileNotFoundException {
         double[] pesos;
-        double[][] MC;
-        double[][] MNorm;
-        double[][] matrizSolucao;
-        double[][] matrizSeparadaIdealP;
-        double[][] matrizSeparadaIdealN;
+        double[][] MC, MNorm,matrizSolucao,matrizSeparadaIdealP,matrizSeparadaIdealN;
         String[][] totalInput = new String[50][50];
         String nomeFich = "inputTOPSIS.txt";
-        String[] beneficios;
-        String[] custos;
-        String[] criterios;
-        String[] alternativas;
+        String[] beneficios,custos,criterios,alternativas;
         int nLinhas = 0, nElementos = 0;
 
         nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
