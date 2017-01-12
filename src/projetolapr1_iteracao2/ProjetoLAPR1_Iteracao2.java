@@ -1,8 +1,6 @@
 package projetolapr1_iteracao2;
 
 import java.io.FileNotFoundException;
-import projetolapr1_iteracao2.MetodoAHP;
-import projetolapr1_iteracao2.MetodoTOPSIS;
 
 /**
  *
