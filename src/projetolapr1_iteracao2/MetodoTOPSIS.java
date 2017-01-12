@@ -18,7 +18,7 @@ public class MetodoTOPSIS {
      */
     public static void main(String[] args) throws FileNotFoundException {
         double[] pesos;
-        double[][] mCriterios, mNorm, mPesada ,matrizSolucao, matrizSeparadaIdealP, matrizSeparadaIdealN;
+        double[][] mCriterios, mNorm, mPesada, matrizSolucao, matrizSeparadaIdealP, matrizSeparadaIdealN;
         String[][] totalInput = new String[50][50];
         String nomeFich = "inputTOPSIS.txt";
         String[] beneficios, custos, criterios, alternativas;
@@ -36,8 +36,8 @@ public class MetodoTOPSIS {
         alternativas = comporArray(totalInput[6], nElementos);
         mCriterios = criarMatrizCriterios(totalInput, alternativas, criterios);
         mNorm = matrizNormalizada(mCriterios, alternativas, criterios);
-        mPesada = matrizPesada(mNorm,pesos);
-        matrizSolucao = selectSolucoes(mNorm, criterios);
+        mPesada = matrizPesada(mNorm, pesos);
+        matrizSolucao = selectSolucoes(mPesada, criterios, custos);
         /*matrizSeparadaIdealP = detSeparacaoP(mNorm, criterios, alternativas, matrizSolucao);
         matrizSeparadaIdealN = detSeparacaoN(mNorm, criterios, alternativas, matrizSolucao);*/
     }
@@ -108,7 +108,7 @@ public class MetodoTOPSIS {
             }
         }
 
-        return operaracaoSomatorio( temp, mCriterios);
+        return operaracaoSomatorio(temp, mCriterios);
     }
 
     public static double[][] operaracaoSomatorio(double[][] temp, double[][] mCriterios) {
@@ -131,8 +131,8 @@ public class MetodoTOPSIS {
 
     }
 
-    public static double[][] matrizPesada(double[][]mNorm,double[] pesos){
-        double [][] temp= new double[mNorm.length][mNorm[0].length];
+    public static double[][] matrizPesada(double[][] mNorm, double[] pesos) {
+        double[][] temp = new double[mNorm.length][mNorm[0].length];
         for (int i = 0; i < mNorm.length; i++) {
             for (int j = 0; j < mNorm[i].length; j++) {
                 temp[i][j] = mNorm[i][j] * pesos[j];
@@ -140,25 +140,40 @@ public class MetodoTOPSIS {
         }
         return temp;
     }
-    public static double[][] selectSolucoes(double[][] mNorm, String[] criterios) {
+
+    public static double[][] selectSolucoes(double[][] mPesada, String[] criterios, String[] custos) {
         double[][] matrizSolucao = new double[2][criterios.length];
         double ideal, idealNEG;
-        for (int i = 0; i < mNorm.length; i++) {
+        for (int i = 0; i < mPesada.length; i++) {
             ideal = 0;
             idealNEG = 100000;
-            for (int j = 0; j < mNorm.length; j++) {
+            for (int j = 0; j < mPesada.length; j++) {
 
-                if (ideal < mNorm[i][j]) {
-                    matrizSolucao[0][i] = mNorm[i][j];
-                    ideal = mNorm[i][j];
+                if (ideal < mPesada[j][i]) {
+                    matrizSolucao[0][i] = mPesada[j][i];
+                    ideal = mPesada[j][i];
                 }
-                if (idealNEG > mNorm[i][j]) {
-                    matrizSolucao[1][i] = mNorm[i][j];
-                    idealNEG = mNorm[i][j];
+                if (idealNEG > mPesada[j][i]) {
+                    matrizSolucao[1][i] = mPesada[j][i];
+                    idealNEG = mPesada[j][i];
 
                 }
             }
 
+        }
+        return ordenarValoresIdeais(custos, criterios, matrizSolucao);
+    }
+
+    public static double[][] ordenarValoresIdeais(String[] custos, String[] criterios, double[][] matrizSolucao) {
+        double aux;
+        for (int i = 0; i < custos.length; i++) {
+            for (int j = 0; j < criterios.length; j++) {
+                if (criterios[j].equals(custos[i])) {
+                    aux = matrizSolucao[0][j];
+                    matrizSolucao[0][j] = matrizSolucao[1][j];
+                    matrizSolucao[1][j] = aux;
+                }
+            }
         }
         return matrizSolucao;
     }
