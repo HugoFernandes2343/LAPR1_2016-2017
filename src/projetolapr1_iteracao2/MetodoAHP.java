@@ -774,10 +774,23 @@ public class MetodoAHP {
         }
         return melhorEscolha;
     }
+    
+    public static boolean confirmacaoDadosIrrelevantes(String[] posicaoDadosIrrelevantes){
+        int flag = 0;
+        for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
+            if (posicaoDadosIrrelevantes[i] != null) {
+                flag = 1;
+            }
+        }
+        if (flag == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     /**
      * OUTPUT PARA TXT
-     *
      * @param Output File de output definido pelo utilizador
      * @param matrizTotal matriz dos dados totais
      * @param escolhas matriz que guarda os dados das pontuações das escolhas
@@ -796,11 +809,13 @@ public class MetodoAHP {
             }
             out.format("%n");
         }
-        out.format("%25s", "Atributos Ignorados:");
-        out.format("%n");
-        for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
-            if (posicaoDadosIrrelevantes[i] != null) {
-                out.format("%25s", posicaoDadosIrrelevantes[i]);
+        if (confirmacaoDadosIrrelevantes(posicaoDadosIrrelevantes) == true) {
+            out.format("%25s", "Atributos Ignorados:");
+            out.format("%n");
+            for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
+                if (posicaoDadosIrrelevantes[i] != null) {
+                    out.format("%25s", posicaoDadosIrrelevantes[i]);
+                }
             }
         }
         out.format("%n");
@@ -824,16 +839,17 @@ public class MetodoAHP {
             }
             out.format("%n");
         }
+        out.format("%n");
         out.format("%20s", "Pontuação Final");
         out.format("%n");
         for (int a = 0; a < escolhas.length; a++) {
             for (int b = 0; b < escolhas[a].length; b++) {
-                out.format("%20s", "Alternativa " + (a + 1) + ": " + (double) Math.round(escolhas[a][b] * 100) / 100);
+                out.format("%20s", " " + m_cabecalhos[1][melhorEscolha] + " : " + (double) Math.round(escolhas[a][b] * 100) / 100);
             }
             out.format("%n");
         }
         out.format("%n");
-        out.format("A melhor alternativa é a alternativa: " + m_cabecalhos[1][melhorEscolha]);
+        out.format("A melhor alternativa é : " + m_cabecalhos[1][melhorEscolha]);
         out.close();
     }
 }
