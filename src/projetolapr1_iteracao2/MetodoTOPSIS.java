@@ -47,8 +47,8 @@ public class MetodoTOPSIS {
     /**
      *
      * @param Input
-     * @param totalInput
-     * @param nLinhas
+     * @param totalInput, dados retirados do ficheiro de input gravada linha a linha
+     * @param nLinhas, numero de linhas com informacao do ficheiro input
      * @return
      * @throws FileNotFoundException
      */
@@ -66,9 +66,9 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param linhaDados
-     * @param nLinhas
-     * @param totalInput
+     * @param linhaDados, linha de dados extraida do input 
+     * @param nLinhas, numero total de linhas com informacao do ficheiro de input
+     * @param totalInput, matriz com os dados retirados do ficheiro de input gravada linha a linha
      * @return
      */
     public static int gravarInput(String linhaDados, int nLinhas, String[][] totalInput) {
@@ -82,8 +82,8 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param linha
-     * @return
+     * @param linha, linha da matriz 
+     * @return numero de elementos da matriz - 1 porque o primeiro elemento é descritivo do que esta na linha  
      */
     public static int encontrarNEelementos(String[] linha) {
         int nElementos = 0;
@@ -99,7 +99,7 @@ public class MetodoTOPSIS {
      *
      * @param dados, valores que vêm do input que descrevem a importancia relativa de cada criterio, a soma de todos os valores tem que ser igual a 1
      * @param nElementos
-     * @return
+     * @return sintetisa a informação da linha para dentro do array
      */
     public static String[] comporArray(String[] dados, int nElementos) {
         String[] temp = new String[nElementos];
@@ -126,7 +126,7 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param totalnput
+     * @param totalnput, dados retirados do ficheiro de input gravada linha a linha
      * @param alternativas, array que contem o nome de todas as opçoes
      * @param criterios, nomes dos critérios dispostos num array
      * @return matriz que contem os valores da classificação de cada alternativa de acordo com cada critério
