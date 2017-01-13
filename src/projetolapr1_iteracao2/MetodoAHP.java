@@ -25,24 +25,23 @@ public class MetodoAHP {
 
     public static void main(/*String[] args*/double limiarCriterio, double limiarRC, String Input, String Output) throws FileNotFoundException {
         //String Input = "DadosInputAHP.txt", Output = "DadosOutputAHPIt2.txt";//ExemploTeste
-        //String[][] matrizTotalInput = new String[50][100], m_cabecalhos = null;
         int nLinhas, op;
         //double limiarCriterio = 0.2, limiarRC = 0.05;//ExemploTeste
         Formatter logErros = new Formatter(new File(FILE_LOG_ERROS));
         do {
             op = menu();
-                nLinhas = 0;
-                nLinhas = LerFicheiroInput(Input, nLinhas, matrizTotalInput, logErros);
-                //System.out.println(nLinhas + " linhas de info lidas");
-                N_CRITERIOS = encontrarNELEMENTOS(matrizTotalInput[0]);
-                N_ALTERNATIVAS = encontrarNELEMENTOS(matrizTotalInput[N_CRITERIOS + 1]);
-                matrizCriterios = criarMatrizCriterios(matrizTotalInput, matrizCriterios, N_CRITERIOS, logErros);
-                m_cabecalhos = criarMatrizCabecalhos(matrizTotalInput, matrizCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos);
-                matrizTotalCriterios = criarMatrizTotalCriterios(matrizTotalInput, matrizCriterios, matrizTotalCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos, logErros);
-                matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, matrizCriterios, matrizTotalCriterios, N_ALTERNATIVAS, N_CRITERIOS);
-                matrizCriteriosNormalizada = normalizar(matrizSomatorios, matrizCriterios, matrizCriteriosNormalizada, 0);
-                matrizTotalNormalizacao = normalizarMatrizes(matrizSomatorios, matrizTotalCriterios, matrizCriterios, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
-                mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
+            nLinhas = 0;
+            nLinhas = LerFicheiroInput(Input, nLinhas, matrizTotalInput, logErros);
+            //System.out.println(nLinhas + " linhas de info lidas");
+            N_CRITERIOS = encontrarNELEMENTOS(matrizTotalInput[0]);
+            N_ALTERNATIVAS = encontrarNELEMENTOS(matrizTotalInput[N_CRITERIOS + 1]);
+            matrizCriterios = criarMatrizCriterios(matrizTotalInput, matrizCriterios, N_CRITERIOS, logErros);
+            m_cabecalhos = criarMatrizCabecalhos(matrizTotalInput, matrizCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos);
+            matrizTotalCriterios = criarMatrizTotalCriterios(matrizTotalInput, matrizCriterios, matrizTotalCriterios, N_CRITERIOS, N_ALTERNATIVAS, nLinhas, m_cabecalhos, logErros);
+            matrizSomatorios = criarMatrizSomatorios(matrizSomatorios, matrizCriterios, matrizTotalCriterios, N_ALTERNATIVAS, N_CRITERIOS);
+            matrizCriteriosNormalizada = normalizar(matrizSomatorios, matrizCriterios, matrizCriteriosNormalizada, 0);
+            matrizTotalNormalizacao = normalizarMatrizes(matrizSomatorios, matrizTotalCriterios, matrizCriterios, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
+            mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
             switch (op) {
                 case 1:
                     RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
@@ -504,9 +503,9 @@ public class MetodoAHP {
         printMatrizTotalInput(matrizTotal, nLinhasOutput);
         for (int i = 0; i < RCValues.length; i++) {
             if (RCValues[i][0] > limiarRC) {
-                System.out.println("Os valores das prioridades relativas da " + (i + 1) + "ªmatriz inserida no input não são consistentes, RC:" + RCValues[i][0]);
+                System.out.println("Os valores das prioridades relativas da matriz " + m_cabecalhos[i][0] + " inserida no input não são consistentes, RC:" + RCValues[i][0]);
             } else if (RCValues[i][0] <= 0.1) {
-                System.out.println("Os valores das prioridades relativas da " + (i + 1) + "ªmatriz inserida no input são consistentes, RC:" + RCValues[i][0]);
+                System.out.println("Os valores das prioridades relativas da matriz " + m_cabecalhos[i][0] + " inserida no input são consistentes, RC:" + RCValues[i][0]);
             }
         }
         escolhas = calcularEscolhas(matrizCriterios, mPrioridadeRelativa, limiarCriterio, m_cabecalhos);
@@ -517,7 +516,7 @@ public class MetodoAHP {
         } else if (op == 2) {
             printMatriz(escolhas);
         }
-        System.out.println("A melhor alternativa segundo os critérios é a alternativa " + encontrarMelhorEscolha(escolhas));
+        System.out.println("A melhor alternativa segundo os critérios é a alternativa " + m_cabecalhos[1][encontrarMelhorEscolha(escolhas)]);
         guardarOutputTotalTXT(Output, matrizTotal, escolhas, nLinhasOutput, encontrarMelhorEscolha(escolhas), RCValues, mPrioridadeRelativa);
     }
 
@@ -528,6 +527,13 @@ public class MetodoAHP {
      * @param matrizTotal matriz de dados totais
      * @param nLinhasOutput numero de linhas usadas para Output
      * @param op flag de escolha do utilizador
+     * @param matrizCriterios matriz dos pesos
+     * @param m_cabecalhos matriz dos cabeçalhos
+     * @param matrizTotalCriterios matriz de dados das comparações dos critérios
+     * @param matrizSomatorios matriz dos dados dos somatórios
+     * @param matrizCriteriosNormalizada matriz dos pesos normalizada
+     * @param mPrioridadeRelativa matriz das prioridades relativas
+     * @param matrizTotalNormalizacao matriz dos dados de comparação normalizada
      * @return
      */
     public static int juntarDados(String[][] matrizTotal, int nLinhasOutput, int op, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa) {
@@ -691,7 +697,7 @@ public class MetodoAHP {
             }
         }
         System.out.println(" ");
-        if(confirmacaoLimiar(posicao)==true){
+        if (confirmacaoLimiar(posicao) == true) {
             System.out.println("Os atributos eliminados são:");
             for (int k = 0; k < posicao.length; k++) {
                 if (posicao[k] == 1) {
@@ -727,19 +733,19 @@ public class MetodoAHP {
         }
         return posicao;
     }
-    
-    public static boolean confirmacaoLimiar(int[] posicao){
-        int flag=0;
-        for(int i=0;i<posicao.length;i++){
-            if(posicao[i]==1){
-                flag=1;  
+
+    public static boolean confirmacaoLimiar(int[] posicao) {
+        int flag = 0;
+        for (int i = 0; i < posicao.length; i++) {
+            if (posicao[i] == 1) {
+                flag = 1;
             }
         }
-        if(flag==0){
+        if (flag == 0) {
             return false;
-        }else{
+        } else {
             return true;
-        } 
+        }
     }
 
     public static int recontagemCriterios(int NCriteriosIrrelevantes, int[] posicao) {
@@ -827,7 +833,7 @@ public class MetodoAHP {
             out.format("%n");
         }
         out.format("%n");
-        out.format("A melhor alternativa é a alternativa: " + melhorEscolha);
+        out.format("A melhor alternativa é a alternativa: " + m_cabecalhos[1][melhorEscolha]);
         out.close();
     }
 }
