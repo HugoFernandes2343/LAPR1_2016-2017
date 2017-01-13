@@ -492,6 +492,7 @@ public class MetodoAHP {
      * matrizes normalizadas
      * @param mPrioridadeRelativa matriz da prioridade
      * @param limiarRC limiar definido pelo utilizador para o RC
+     * @param limiarCriterio limiar definido pelo utilizador para os pesos
      * @throws FileNotFoundException
      */
     public static void selecaoOutput(String Output, int op, double[][] RCValues, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa, double limiarRC, double limiarCriterio) throws FileNotFoundException {
@@ -664,7 +665,7 @@ public class MetodoAHP {
      *
      * @param matriz matriz para o Output
      */
-    private static void printMatrizTotalInput(String[][] matrizTotal, int nLinhasOutput) {
+    public static void printMatrizTotalInput(String[][] matrizTotal, int nLinhasOutput) {
         for (int i = 0; i < nLinhasOutput / 2; i++) {
             for (int j = 0; j < matrizTotal[i].length; j++) {
                 System.out.printf("%18s", matrizTotal[i][j]);

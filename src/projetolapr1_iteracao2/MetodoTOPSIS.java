@@ -19,8 +19,8 @@ public class MetodoTOPSIS {
     public static void main(String[] args) throws FileNotFoundException {
         double[] pesos, matrizSeparacaoIdealN, matrizSeparacaoIdealP, vetorPrioridadeComposta;
         double[][] mCriterios, mNorm, mPesada, matrizSolucao;
-        String[][] totalInput = new String[50][50];
-        String nomeFich = "inputTOPSIS.txt";
+        String[][] totalInput = new String[100][50];
+        String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt";
         String[] beneficios, custos, criterios, alternativas, melhorOpcao;
         int nLinhas = 0, nElementos = 0;
 
@@ -42,12 +42,14 @@ public class MetodoTOPSIS {
         matrizSeparacaoIdealN = detSeparacaoIdealN(mPesada, criterios, alternativas, matrizSolucao);
         vetorPrioridadeComposta = vetorSolucao(matrizSeparacaoIdealP, matrizSeparacaoIdealN, alternativas);
         melhorOpcao = melhorAlternativa(vetorPrioridadeComposta, alternativas);
+        selecaoOutput(output, beneficios, custos, criterios, totalInput, alternativas, pesos, mCriterios, mNorm, mPesada, matrizSolucao, matrizSeparacaoIdealP, matrizSeparacaoIdealN, vetorPrioridadeComposta, melhorOpcao, nLinhas);
     }
 
     /**
      *
      * @param Input
-     * @param totalInput, dados retirados do ficheiro de input gravada linha a linha
+     * @param totalInput, dados retirados do ficheiro de input gravada linha a
+     * linha
      * @param nLinhas, numero de linhas com informacao do ficheiro input
      * @return
      * @throws FileNotFoundException
@@ -66,9 +68,11 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param linhaDados, linha de dados extraida do input 
-     * @param nLinhas, numero total de linhas com informacao do ficheiro de input
-     * @param totalInput, matriz com os dados retirados do ficheiro de input gravada linha a linha
+     * @param linhaDados, linha de dados extraida do input
+     * @param nLinhas, numero total de linhas com informacao do ficheiro de
+     * input
+     * @param totalInput, matriz com os dados retirados do ficheiro de input
+     * gravada linha a linha
      * @return
      */
     public static int gravarInput(String linhaDados, int nLinhas, String[][] totalInput) {
@@ -82,8 +86,9 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param linha, linha da matriz 
-     * @return numero de elementos da matriz - 1 porque o primeiro elemento é descritivo do que esta na linha  
+     * @param linha, linha da matriz
+     * @return numero de elementos da matriz - 1 porque o primeiro elemento é
+     * descritivo do que esta na linha
      */
     public static int encontrarNEelementos(String[] linha) {
         int nElementos = 0;
@@ -97,7 +102,9 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param dados, valores que vêm do input que descrevem a importancia relativa de cada criterio, a soma de todos os valores tem que ser igual a 1
+     * @param dados, valores que vêm do input que descrevem a importancia
+     * relativa de cada criterio, a soma de todos os valores tem que ser igual a
+     * 1
      * @param nElementos
      * @return sintetisa a informação da linha para dentro do array
      */
@@ -111,9 +118,12 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param dados, valores que vêm do input que descrevem a importancia relativa de cada criterio, a soma de todos os valores tem que ser igual a 1
+     * @param dados, valores que vêm do input que descrevem a importancia
+     * relativa de cada criterio, a soma de todos os valores tem que ser igual a
+     * 1
      * @param criterios, nomes dos critérios dispostos num array
-     * @return array que possui o peso de cada critério de acordo com o critério correspondente
+     * @return array que possui o peso de cada critério de acordo com o critério
+     * correspondente
      */
     public static double[] criarVetorPesos(String[] dados, String[] criterios) {
         double[] pesos = new double[criterios.length];
@@ -126,10 +136,12 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param totalnput, dados retirados do ficheiro de input gravada linha a linha
+     * @param totalnput, dados retirados do ficheiro de input gravada linha a
+     * linha
      * @param alternativas, array que contem o nome de todas as opçoes
      * @param criterios, nomes dos critérios dispostos num array
-     * @return matriz que contem os valores da classificação de cada alternativa de acordo com cada critério
+     * @return matriz que contem os valores da classificação de cada alternativa
+     * de acordo com cada critério
      */
     public static double[][] criarMatrizCriterios(String[][] totalnput, String[] alternativas, String[] criterios) {
         double[][] mCriterios = new double[criterios.length][alternativas.length];
@@ -143,10 +155,13 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param mCriterios, matriz que contem os valores da classificação de cada alternativa de acordo com cada critério
+     * @param mCriterios, matriz que contem os valores da classificação de cada
+     * alternativa de acordo com cada critério
      * @param alternativas, array que contem o nome de todas as opçoes
      * @param criterios, nomes dos critérios dispostos num array
-     * @return resultado do metodo operaçãoSomatorio, matriz pesada, ou seja, resultado da divisao de cada elemento de mCriterios pela raiz do somatorio dos seus quadrados
+     * @return resultado do metodo operaçãoSomatorio, matriz pesada, ou seja,
+     * resultado da divisao de cada elemento de mCriterios pela raiz do
+     * somatorio dos seus quadrados
      */
     public static double[][] matrizNormalizada(double[][] mCriterios, String[] alternativas, String[] criterios) {
         double temp[][] = new double[criterios.length][alternativas.length];
@@ -161,9 +176,12 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param temp, matriz temporária utilizada para guardar valores de mCriterios elevados ao quadrado
-     * @param mCriterios, matriz que contem os valores da classificação de cada alternativa de acordo com cada critério
-     * @return matriz pesada, ou seja, resultado da divisao de cada elemento de mCriterios pela raiz do somatorio dos seus quadrados
+     * @param temp, matriz temporária utilizada para guardar valores de
+     * mCriterios elevados ao quadrado
+     * @param mCriterios, matriz que contem os valores da classificação de cada
+     * alternativa de acordo com cada critério
+     * @return matriz pesada, ou seja, resultado da divisao de cada elemento de
+     * mCriterios pela raiz do somatorio dos seus quadrados
      */
     public static double[][] operaracaoSomatorio(double[][] temp, double[][] mCriterios) {
         double soma;
@@ -187,9 +205,11 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param mNorm, matriz pesada, ou seja, resultado da divisao de cada elemento de mCriterios pela raiz do somatorio dos seus quadrados
+     * @param mNorm, matriz pesada, ou seja, resultado da divisao de cada
+     * elemento de mCriterios pela raiz do somatorio dos seus quadrados
      * @param pesos, array que contem o peso de cada criterio
-     * @return matriz intermedia resultante da multiplicação de cada valor da matriz pesada pelo critério da coluna a que pertemcem
+     * @return matriz intermedia resultante da multiplicação de cada valor da
+     * matriz pesada pelo critério da coluna a que pertemcem
      */
     public static double[][] matrizPesada(double[][] mNorm, double[] pesos) {
         double[][] temp = new double[mNorm.length][mNorm[0].length];
@@ -203,10 +223,12 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param mPesada, matriz resultante da multiplicaçao de cada valor da matriz pesada pelo critério da coluna a que pertencem
+     * @param mPesada, matriz resultante da multiplicaçao de cada valor da
+     * matriz pesada pelo critério da coluna a que pertencem
      * @param criterios, nomes dos critérios dispostos num array
      * @param custos, array com o nome dos criterios custo
-     * @return matriz que contem os valores da solucao ideal e da solucao ideal negativa
+     * @return matriz que contem os valores da solucao ideal e da solucao ideal
+     * negativa
      */
     public static double[][] selectSolucoes(double[][] mPesada, String[] criterios, String[] custos) {
         double[][] matrizSolucao = new double[2][criterios.length];
@@ -235,8 +257,10 @@ public class MetodoTOPSIS {
      *
      * @param custos, array com o nome dos criterios custo
      * @param criterios, nomes dos critérios dispostos num array
-     * @param matrizSolucao, matriz vazia onde serão escritos os valores das soluçoes ideais
-     * @return matriz que contem os valores da solucao ideal e da solucao ideal negativa
+     * @param matrizSolucao, matriz vazia onde serão escritos os valores das
+     * soluçoes ideais
+     * @return matriz que contem os valores da solucao ideal e da solucao ideal
+     * negativa
      */
     public static double[][] ordenarValoresIdeais(String[] custos, String[] criterios, double[][] matrizSolucao) {
         double aux;
@@ -254,11 +278,14 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param mPesada, matriz resultante da multiplicaçao de cada valor da matriz pesada pelo critério da coluna a que pertencem
+     * @param mPesada, matriz resultante da multiplicaçao de cada valor da
+     * matriz pesada pelo critério da coluna a que pertencem
      * @param alternativas, array que contem o nome de todas as opçoes
      * @param criterios, nomes dos critérios dispostos num array
-     * @param matrizSolucao, matriz que contem os valores da solucao ideal e da solucao ideal negativa
-     * @return array que contem os valores da separação de cada alternativa até a solução ideal
+     * @param matrizSolucao, matriz que contem os valores da solucao ideal e da
+     * solucao ideal negativa
+     * @return array que contem os valores da separação de cada alternativa até
+     * a solução ideal
      */
     public static double[] detSeparacaoIdealP(double[][] mPesada, String[] alternativas, String[] criterios, double[][] matrizSolucao) {
         double[] matrizSeparacaoIdealP = new double[alternativas.length];
@@ -277,11 +304,14 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param mPesada, matriz resultante da multiplicaçao de cada valor da matriz pesada pelo critério da coluna a que pertencem
+     * @param mPesada, matriz resultante da multiplicaçao de cada valor da
+     * matriz pesada pelo critério da coluna a que pertencem
      * @param alternativas, array que contem o nome de todas as opçoes
      * @param criterios, nomes dos critérios dispostos num array
-     * @param matrizSolucao matriz que contem os valores da solucao ideal e da solucao ideal negativa
-     * @return array que contem os valores da separação de cada alternativa até a solução ideal negativa
+     * @param matrizSolucao matriz que contem os valores da solucao ideal e da
+     * solucao ideal negativa
+     * @return array que contem os valores da separação de cada alternativa até
+     * a solução ideal negativa
      */
     public static double[] detSeparacaoIdealN(double[][] mPesada, String[] alternativas, String[] criterios, double[][] matrizSolucao) {
         double[] matrizSeparacaoIdealN = new double[alternativas.length];
@@ -300,10 +330,13 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param matrizSeparacaoIdealN, array que contem os valores da diferença de cada alternativa até a solução ideal negativa
-     * @param matrizSeparacaoIdealP, array que contem os valores da diferença de cada alternativa até a solução ideal 
+     * @param matrizSeparacaoIdealN, array que contem os valores da diferença de
+     * cada alternativa até a solução ideal negativa
+     * @param matrizSeparacaoIdealP, array que contem os valores da diferença de
+     * cada alternativa até a solução ideal
      * @param alternativas, array que contem o nome de todas as opçoes
-     * @return, array com os valores resultantes da operação Ci*=Si'/(Si'+Si*) do final do metodo topsis para cada alternativa
+     * @return, array com os valores resultantes da operação Ci*=Si'/(Si'+Si*)
+     * do final do metodo topsis para cada alternativa
      */
     public static double[] vetorSolucao(double[] matrizSeparacaoIdealN, double[] matrizSeparacaoIdealP, String[] alternativas) {
         double valor = 0;
@@ -317,22 +350,177 @@ public class MetodoTOPSIS {
 
     /**
      *
-     * @param vetorPrioridadeComposta, array com os valores resultantes da operação Ci*=Si'/(Si'+Si*) do final do metodo topsis para cada alternativa
+     * @param vetorPrioridadeComposta, array com os valores resultantes da
+     * operação Ci*=Si'/(Si'+Si*) do final do metodo topsis para cada
+     * alternativa
      * @param alternativas, array que contem o nome de todas as opçoes
-     * @return array em que se contem o nome da melhor alternativa e o valor da prioridade da mesma
+     * @return array em que se contem o nome da melhor alternativa e o valor da
+     * prioridade da mesma
      */
     public static String[] melhorAlternativa(double[] vetorPrioridadeComposta, String[] alternativas) {
         double valorTemp = 0;
         int indiceTemp = 0;
         String[] resposta = new String[2];
-        for (int i = 0; i < alternativas.length; i++){
-            if(vetorPrioridadeComposta[i]>valorTemp){
-            resposta[1]= Double.toString(vetorPrioridadeComposta[i]);
-            indiceTemp = i;
-            valorTemp = vetorPrioridadeComposta[i];
+        for (int i = 0; i < alternativas.length; i++) {
+            if (vetorPrioridadeComposta[i] > valorTemp) {
+                resposta[1] = Double.toString(vetorPrioridadeComposta[i]);
+                indiceTemp = i;
+                valorTemp = vetorPrioridadeComposta[i];
             }
         }
         resposta[0] = alternativas[indiceTemp];
         return resposta;
+    }
+
+    public static void printMatrizString(String[][] matriz) {
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                System.out.printf("%25s", matriz[i][j]);
+            }
+            System.out.println("");
+        }
+    }
+
+    public static void printMatrizDouble(double[][] matriz) {
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                System.out.printf("%25s", String.valueOf(matriz[i][j]));
+            }
+            System.out.println("");
+        }
+    }
+
+    private static void printMatrizStringInput(String[][] matriz, int nLinhas) {
+        for (int i = 0; i < nLinhas + 3; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                System.out.printf("%25s", matriz[i][j]);
+            }
+            System.out.println("");
+        }
+    }
+
+    public static void selecaoOutput(String output, String[] beneficios, String[] custos, String[] criterios, String[][] totalInput, String[] alternativas, double[] pesos, double[][] mCriterios, double[][] mNorm, double[][] mPesada, double[][] matrizSolucao, double[] matrizSeparacaoIdealP, double[] matrizSeparacaoIdealN, double[] vetorPrioridadeComposta, String[] melhorOpcao, int nLinhas) {
+        int nLinhasOutput = 0;
+        String[][] matrizTotalOutput=new String[][];
+        printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
+        nLinhasOutput=juntarDados(matrizTotal)
+    }
+
+    public static int juntarDados(String[][] matrizTotal, int nLinhasOutput, int op, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa) {
+        int nColuna = 0;
+        for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
+            if (nMatriz == 0) {
+                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
+                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(matrizCriterios, op), nLinhasOutput);
+                nLinhasOutput++;
+            } else {
+                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
+                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(identificarMatriz(matrizTotalCriterios, nMatriz - 1, N_ALTERNATIVAS), op), nLinhasOutput);
+                nLinhasOutput++;
+            }
+        }
+        for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
+            if (nMatriz == 0) {
+                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
+                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(matrizCriteriosNormalizada, op), nLinhasOutput);
+                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
+                nLinhasOutput++;
+            } else {
+                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
+                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(identificarMatriz(matrizTotalNormalizacao, nMatriz - 1, N_ALTERNATIVAS), op), nLinhasOutput);
+                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
+                nLinhasOutput++;
+            }
+        }
+        return nLinhasOutput;
+    }
+    
+    public static void printConsola(String[][] totalInput, int nLinhas, double[][] mPesada, double[] vetorPrioridadeComposta, String[] melhorOpcao) {
+        printMatrizStringInput(MetodoAHP.eliminarNull(totalInput), nLinhas);
+        System.out.println(" ");
+        System.out.println("Matriz Normalizada Pesada");
+        printMatrizDouble(mPesada);
+        System.out.println("Vetor Proximidade Relativa");
+        for (int i = 0; i < vetorPrioridadeComposta.length; i++) {
+            System.out.printf("%25s", vetorPrioridadeComposta[i]);
+        }
+        System.out.println(" ");
+        System.out.println("Melhor Alternativa");
+        System.out.println("Nome: " + melhorOpcao[0]);
+        System.out.println("Pontuação: " + melhorOpcao[1]);
+    }
+
+    public static void guardarOutputTotalTXT(String output, String[] beneficios, String[] custos, String[] criterios, String[][] totalInput, String[] alternativas, double[] pesos, double[][] mCriterios, double[][] mNorm, double[][] mPesada, double[][] matrizSolucao, double[] matrizSeparacaoIdealP, double[] matrizSeparacaoIdealN, double[] vetorPrioridadeComposta, String[] melhorOpcao, int nLinhas) throws FileNotFoundException {
+        Formatter out = new Formatter(new File(output));
+        for (int i = 0; i < nLinhasOutput; i++) {
+            for (int j = 0; j < matrizTotal[i].length; j++) {
+                out.format("%20s", matrizTotal[i][j]);
+            }
+            out.format("%n");
+        }
+        if (confirmacaoDadosIrrelevantes(posicaoDadosIrrelevantes) == true) {
+            out.format("%25s", "Atributos Ignorados:");
+            out.format("%n");
+            for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
+                if (posicaoDadosIrrelevantes[i] != null) {
+                    out.format("%25s", posicaoDadosIrrelevantes[i]);
+                }
+            }
+        }
+        out.format("%n");
+        /*out.format("%25s", "RC");
+        out.format("%25s", "Valor Próprio Máx");
+        out.format("%25s", "IR");
+        out.format("%n");
+        for (int a = 0; a < RCValues.length; a++) {
+            for (int b = 0; b < RCValues[a].length; b++) {
+                out.format("%25s", (a + 1) + " : " + (double) Math.round(RCValues[a][b] * 1000) / 1000);
+            }
+            out.format("%n");
+        }*/
+        out.format("%25s", "Vetor Distancia a Solução Ideal");
+        out.format("%n");
+        for (int a = 0; a < alternativas.length; a++) {
+            out.format("%25s", "   " + alternativas[a]);
+        }
+        out.format("%n");
+        for (int a = 0; a < matrizSeparacaoIdealP.length; a++) {
+            out.format("%25s", "   " + matrizSeparacaoIdealP[a]);
+        }
+        out.format("%25s", "Vetor Distancia a Solução Ideal");
+        out.format("%n");
+        for (int a = 0; a < alternativas.length; a++) {
+            out.format("%25s", "   " + alternativas[a]);
+        }
+        out.format("%n");
+        for (int a = 0; a < matrizSeparacaoIdealP.length; a++) {
+            out.format("%25s", "   " + matrizSeparacaoIdealP[a]);
+        }
+        printVectorTxt(out, "Solucoes Ideais", criterios, matrizSolucao[0]);
+        out.format("%n");
+        printVectorTxt(out, "Solucoes Ideais Negativos", criterios, matrizSolucao[1]);
+        out.format("%n");
+        printVectorTxt(out, "Vetor Distancia a Solução Ideal", alternativas, matrizSeparacaoIdealP);
+        out.format("%n");
+        printVectorTxt(out, "Vetor Distancia a Solução Ideal Negativa", alternativas, matrizSeparacaoIdealN);
+        out.format("%n");
+        printVectorTxt(out, "Vetor Prioridade Relativa // Pontuação Final", alternativas, vetorPrioridadeComposta);
+        out.format("%n");
+        out.format("Melhor Alternativa");
+        out.format("Nome: " + melhorOpcao[0]);
+        out.format("Pontuação: " + melhorOpcao[1]);
+        out.close();
+    }
+
+    public static void printVectorTxt(Formatter out, String titulo, String[] cabecalho, double[] vetor) {
+        out.format("%25s", titulo);
+        out.format("%n");
+        for (int a = 0; a < cabecalho.length; a++) {
+            out.format("%25s", "   " + cabecalho[a]);
+        }
+        out.format("%n");
+        for (int a = 0; a < vetor.length; a++) {
+            out.format("%25s", " | " + vetor[a]);
+        }
     }
 }
