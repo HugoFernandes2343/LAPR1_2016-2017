@@ -1,0 +1,47 @@
+
+              Vetor Pesos
+                   Estilo           Confiabilidade                  Consumo                    Custo
+                      0.1                      0.4                      0.3                      0.2
+
+         Matriz Criterios                   Estilo           Confiabilidade                  Consumo                    Custo
+                    Civic                      7.0                      9.0                      9.0                      8.0
+                   Saturn                      8.0                      7.0                      8.0                      7.0
+                     Ford                      9.0                      6.0                      8.0                      9.0
+                    Mazda                      6.0                      7.0                      8.0                      6.0
+
+       Matriz Normalizada                   Estilo           Confiabilidade                  Consumo                    Custo
+                    Civic       0.4615663313770509       0.6137949055234262       0.5447047794019222       0.5275043787166296
+                   Saturn       0.5275043787166296      0.47739603762933147      0.48418202613504197       0.4615663313770509
+                     Ford       0.5934424260562083       0.4091966036822841      0.48418202613504197       0.5934424260562083
+                    Mazda       0.3956282840374722      0.47739603762933147      0.48418202613504197       0.3956282840374722
+
+Matriz Normalizada Pesada                   Estilo           Confiabilidade                  Consumo                    Custo
+                    Civic      0.04615663313770509       0.2455179622093705      0.16341143382057666      0.10550087574332592
+                   Saturn      0.05275043787166296       0.1909584150517326      0.14525460784051258      0.09231326627541019
+                     Ford      0.05934424260562084      0.16367864147291367      0.14525460784051258      0.11868848521124167
+                    Mazda     0.039562828403747224       0.1909584150517326      0.14525460784051258      0.07912565680749445
+
+
+          Solucoes Ideais
+                   Estilo           Confiabilidade                  Consumo                    Custo
+      0.05934424260562084       0.2455179622093705      0.16341143382057666      0.07912565680749445
+
+Solucoes Ideais Negativas
+                   Estilo           Confiabilidade                  Consumo                    Custo
+     0.039562828403747224      0.16367864147291367      0.14525460784051258      0.11868848521124167
+
+Vetor Distancia a Solução Ideal
+                    Civic                   Saturn                     Ford                    Mazda
+     0.029488391230979422      0.05936165277403139       0.0926960740246281      0.06080887158583795
+
+Vetor Distancia a Solução Ideal Negativa
+                    Civic                   Saturn                     Ford                    Mazda
+        0.085116015253434     0.040171523046841684     0.019781414201873612      0.04805625284826082
+
+Vetor Prioridade Relativa // Pontuação Final
+                    Civic                   Saturn                     Ford                    Mazda
+      0.25730591113867807       0.5964006702736263       0.8241300146920176       0.5585707259504255
+
+Melhor Alternativa
+Nome: Ford
+Pontuação: 0.8241300146920176

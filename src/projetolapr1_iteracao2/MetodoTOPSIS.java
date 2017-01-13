@@ -17,32 +17,74 @@ public class MetodoTOPSIS {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException {
-        double[] pesos, matrizSeparacaoIdealN, matrizSeparacaoIdealP, vetorPrioridadeComposta;
-        double[][] mCriterios, mNorm, mPesada, matrizSolucao;
+        double[] pesos = null, vetorDistanciaIdeaIN, vetorDistanciaIdealP, vetorPrioridadeComposta;
+        double[][] mCriterios, mNorm, mPesada, mValoresIdeais;
         String[][] totalInput = new String[100][50];
         String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt";
-        String[] beneficios, custos, criterios, alternativas, melhorOpcao;
-        int nLinhas = 0, nElementos = 0;
+        String[] beneficios, custos, criterios, alternativas, melhorOpcao, faltaCustos = {"crt_custo", "777"};
+        int nLinhas = 0, nElementos = 0, a = 0;
+        nLinhas=LerFicheiroInput(nomeFich, totalInput, nLinhas);
+        if (nLinhas < 7) {
+            //logErros
+        } else {
+            if (!totalInput[0][0].equals("crt_beneficio") || !totalInput[1][0].equals("crt_custo")) {
+                //logErros
+            } else {
+                nElementos = encontrarNEelementos(totalInput[0]);
+                beneficios = comporArray(totalInput[0], nElementos);
+                nElementos = encontrarNEelementos(totalInput[1]);
+                if (nElementos == 0) {
+                    custos = comporArray(faltaCustos, nElementos+1);
+                } else {
+                    custos = comporArray(totalInput[1], nElementos);
+                }
 
-        nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
-        nElementos = encontrarNEelementos(totalInput[0]);
-        beneficios = comporArray(totalInput[0], nElementos);
-        nElementos = encontrarNEelementos(totalInput[1]);
-        custos = comporArray(totalInput[1], nElementos);
-        nElementos = encontrarNEelementos(totalInput[2]);
-        criterios = comporArray(totalInput[2], nElementos);
-        pesos = criarVetorPesos(totalInput[3], criterios);
-        nElementos = encontrarNEelementos(totalInput[6]);
-        alternativas = comporArray(totalInput[6], nElementos);
-        mCriterios = criarMatrizCriterios(totalInput, alternativas, criterios);
-        mNorm = matrizNormalizada(mCriterios, alternativas, criterios);
-        mPesada = matrizPesada(mNorm, pesos);
-        matrizSolucao = selectSolucoes(mPesada, criterios, custos);
-        matrizSeparacaoIdealP = detSeparacaoIdealP(mPesada, criterios, alternativas, matrizSolucao);
-        matrizSeparacaoIdealN = detSeparacaoIdealN(mPesada, criterios, alternativas, matrizSolucao);
-        vetorPrioridadeComposta = vetorSolucao(matrizSeparacaoIdealP, matrizSeparacaoIdealN, alternativas);
-        melhorOpcao = melhorAlternativa(vetorPrioridadeComposta, alternativas);
-        selecaoOutput(output, beneficios, custos, criterios, totalInput, alternativas, pesos, mCriterios, mNorm, mPesada, matrizSolucao, matrizSeparacaoIdealP, matrizSeparacaoIdealN, vetorPrioridadeComposta, melhorOpcao, nLinhas);
+                if (totalInput[2][0].equals("vec_pesos") && totalInput[3][0].contains(".")) {
+                    nElementos = encontrarNEelementos(totalInput[2]);
+                    pesos = gravarVetorPesos(totalInput[3], nElementos);
+                } else if (totalInput[2][0].equals("md_alt_crt") && totalInput[3][0].equals("crt")) {
+                    nElementos = encontrarNEelementos(totalInput[3]);
+                    a = -2;
+                    if (nElementos > 1) {
+                        System.out.println("Vetor Pesos não introduzido");
+                        pesos = criarVetorPesos(nElementos);
+                    } else {
+                        //logErros
+                    }
+                }
+
+                if (totalInput[4 + a][0].equals("md_crt_alt")) {
+                    if (totalInput[5 + a][0].equals("crt")) {
+                        nElementos = encontrarNEelementos(totalInput[5 + a]);
+                        criterios = comporArray(totalInput[5 + a], nElementos);
+                        if (totalInput[6 + a][0].equals("alt")) {
+                            nElementos = encontrarNEelementos(totalInput[6 + a]);
+                            alternativas = comporArray(totalInput[6 + a], nElementos);
+                            //beneficios = comporArray(totalInput[0], nElementos);
+                            mCriterios = criarMatrizCriterios(totalInput, alternativas, criterios, a);
+                            mNorm = matrizNormalizada(mCriterios, alternativas, criterios);
+                            mPesada = matrizPesada(mNorm, pesos);
+                            mValoresIdeais = selectSolucoes(mPesada, criterios, custos);
+                            vetorDistanciaIdealP = detDistanciaIdealP(mPesada, criterios, alternativas, mValoresIdeais);
+                            vetorDistanciaIdeaIN = detDistanciaIdealN(mPesada, criterios, alternativas, mValoresIdeais);
+                            vetorPrioridadeComposta = vetorSolucao(vetorDistanciaIdealP, vetorDistanciaIdeaIN, alternativas);
+                            melhorOpcao = melhorAlternativa(vetorPrioridadeComposta, alternativas);
+                            printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
+                            guardarOutputTotalTXT(output, criterios, alternativas, pesos, mCriterios, mNorm, mPesada, mValoresIdeais, vetorDistanciaIdealP, vetorDistanciaIdeaIN, vetorPrioridadeComposta, melhorOpcao);
+                        } else {
+                            //logErros
+                        }
+                    } else {
+                        //logErros    
+                    }
+                } else {
+                    //logErros
+                }
+
+            }
+
+        }
+
     }
 
     /**
@@ -82,6 +124,74 @@ public class MetodoTOPSIS {
         }
         nLinhas++;
         return nLinhas;
+    }
+
+    public static double[][] tratarDados(String[][] totalInput, int nLinhas, String[] beneficios, String[] custos, double[] pesos, String[] criterios, String[] alternativas) {
+        double[][] mCriterios;
+        int nElementos, a = 0;
+        String[] faltaCustos = {"crt_custo", "777"};
+        if (nLinhas < 7) {
+            //logErros
+        } else {
+            if (!totalInput[0][0].equals("crt_beneficio") || !totalInput[1][0].equals("crt_custo")) {
+                //logErros
+            } else {
+                nElementos = encontrarNEelementos(totalInput[0]);
+                beneficios = comporArray(totalInput[0], nElementos);
+                if (totalInput[1].length == 1) {
+                    nElementos = 1;
+                    custos = comporArray(faltaCustos, nElementos);
+                } else {
+                    nElementos = encontrarNEelementos(totalInput[1]);
+                    custos = comporArray(totalInput[1], nElementos);
+                }
+
+                if (totalInput[2][0].equals("vec_pesos") && totalInput[3][0].contains(".")) {
+                    nElementos = encontrarNEelementos(totalInput[2]);
+                    pesos = gravarVetorPesos(totalInput[3], nElementos);
+                } else if (totalInput[2][0].equals("md_alt_crt") && totalInput[3][0].equals("crt")) {
+                    nElementos = encontrarNEelementos(totalInput[3]);
+                    a = -2;
+                    if (nElementos > 1) {
+                        System.out.println("Vetor Pesos não introduzido");
+                        pesos = criarVetorPesos(nElementos);
+                    } else {
+                        //logErros
+                    }
+                }
+
+                if (totalInput[4 + a][0].equals("md_alt_crt")) {
+                    if (totalInput[5 + a][0].equals("crt")) {
+                        nElementos = encontrarNEelementos(totalInput[5 + a]);
+                        criterios = comporArray(totalInput[5 + a], nElementos);
+                        if (totalInput[6 + a][0].equals("alt")) {
+                            nElementos = encontrarNEelementos(totalInput[6 + a]);
+                            alternativas = comporArray(totalInput[6 + a], nElementos);
+                        } else {
+                            //logErros
+                        }
+                    } else {
+                        //logErros    
+                    }
+                } else {
+                    //logErros
+                }
+
+            }
+
+        }
+        return criarMatrizCriterios(totalInput, alternativas, criterios, a);
+    }
+
+    public static double[] criarVetorPesos(int nCriterios) {
+        double[] pesos = new double[nCriterios];
+        double peso = 0;
+        peso = 1 / nCriterios;
+        for (int i = 0; i < pesos.length; i++) {
+            pesos[i] = peso;
+
+        }
+        return pesos;
     }
 
     /**
@@ -125,8 +235,8 @@ public class MetodoTOPSIS {
      * @return array que possui o peso de cada critério de acordo com o critério
      * correspondente
      */
-    public static double[] criarVetorPesos(String[] dados, String[] criterios) {
-        double[] pesos = new double[criterios.length];
+    public static double[] gravarVetorPesos(String[] dados, int nCriterios) {
+        double[] pesos = new double[nCriterios];
         for (int i = 0; i < pesos.length; i++) {
             pesos[i] = Double.parseDouble(dados[i]);
 
@@ -143,11 +253,11 @@ public class MetodoTOPSIS {
      * @return matriz que contem os valores da classificação de cada alternativa
      * de acordo com cada critério
      */
-    public static double[][] criarMatrizCriterios(String[][] totalnput, String[] alternativas, String[] criterios) {
+    public static double[][] criarMatrizCriterios(String[][] totalInput, String[] alternativas, String[] criterios, int a) {
         double[][] mCriterios = new double[criterios.length][alternativas.length];
         for (int i = 0; i < mCriterios.length; i++) {
             for (int j = 0; j < mCriterios[i].length; j++) {
-                mCriterios[i][j] = Double.parseDouble(totalnput[i + 7][j]);
+                mCriterios[i][j] = Double.parseDouble(totalInput[i + 7 + a][j]);
             }
         }
         return mCriterios;
@@ -231,7 +341,7 @@ public class MetodoTOPSIS {
      * negativa
      */
     public static double[][] selectSolucoes(double[][] mPesada, String[] criterios, String[] custos) {
-        double[][] matrizSolucao = new double[2][criterios.length];
+        double[][] mValoresIdeais = new double[2][criterios.length];
         double ideal, idealNEG;
         for (int i = 0; i < mPesada.length; i++) {
             ideal = 0;
@@ -239,18 +349,18 @@ public class MetodoTOPSIS {
             for (int j = 0; j < mPesada.length; j++) {
 
                 if (ideal < mPesada[j][i]) {
-                    matrizSolucao[0][i] = mPesada[j][i];
+                    mValoresIdeais[0][i] = mPesada[j][i];
                     ideal = mPesada[j][i];
                 }
                 if (idealNEG > mPesada[j][i]) {
-                    matrizSolucao[1][i] = mPesada[j][i];
+                    mValoresIdeais[1][i] = mPesada[j][i];
                     idealNEG = mPesada[j][i];
 
                 }
             }
 
         }
-        return ordenarValoresIdeais(custos, criterios, matrizSolucao);
+        return ordenarValoresIdeais(custos, criterios, mValoresIdeais);
     }
 
     /**
@@ -262,18 +372,18 @@ public class MetodoTOPSIS {
      * @return matriz que contem os valores da solucao ideal e da solucao ideal
      * negativa
      */
-    public static double[][] ordenarValoresIdeais(String[] custos, String[] criterios, double[][] matrizSolucao) {
+    public static double[][] ordenarValoresIdeais(String[] custos, String[] criterios, double[][] mValoresIdeais) {
         double aux;
         for (int i = 0; i < custos.length; i++) {
             for (int j = 0; j < criterios.length; j++) {
                 if (criterios[j].equals(custos[i])) {
-                    aux = matrizSolucao[0][j];
-                    matrizSolucao[0][j] = matrizSolucao[1][j];
-                    matrizSolucao[1][j] = aux;
+                    aux = mValoresIdeais[0][j];
+                    mValoresIdeais[0][j] = mValoresIdeais[1][j];
+                    mValoresIdeais[1][j] = aux;
                 }
             }
         }
-        return matrizSolucao;
+        return mValoresIdeais;
     }
 
     /**
@@ -287,19 +397,19 @@ public class MetodoTOPSIS {
      * @return array que contem os valores da separação de cada alternativa até
      * a solução ideal
      */
-    public static double[] detSeparacaoIdealP(double[][] mPesada, String[] alternativas, String[] criterios, double[][] matrizSolucao) {
-        double[] matrizSeparacaoIdealP = new double[alternativas.length];
+    public static double[] detDistanciaIdealP(double[][] mPesada, String[] alternativas, String[] criterios, double[][] mValoresIdeais) {
+        double[] vetorDistanciaIdealP = new double[alternativas.length];
         double soma, subtracao;
-        for (int i = 0; i < matrizSeparacaoIdealP.length; i++) {
+        for (int i = 0; i < vetorDistanciaIdealP.length; i++) {
             subtracao = 0;
             soma = 0;
             for (int j = 0; j < mPesada.length; j++) {
-                subtracao = mPesada[i][j] - matrizSolucao[0][j];
+                subtracao = mPesada[i][j] - mValoresIdeais[0][j];
                 soma = (Math.pow(subtracao, 2)) + soma;
             }
-            matrizSeparacaoIdealP[i] = Math.sqrt(soma);
+            vetorDistanciaIdealP[i] = Math.sqrt(soma);
         }
-        return matrizSeparacaoIdealP;
+        return vetorDistanciaIdealP;
     }
 
     /**
@@ -313,19 +423,19 @@ public class MetodoTOPSIS {
      * @return array que contem os valores da separação de cada alternativa até
      * a solução ideal negativa
      */
-    public static double[] detSeparacaoIdealN(double[][] mPesada, String[] alternativas, String[] criterios, double[][] matrizSolucao) {
-        double[] matrizSeparacaoIdealN = new double[alternativas.length];
+    public static double[] detDistanciaIdealN(double[][] mPesada, String[] alternativas, String[] criterios, double[][] mValoresIdeais) {
+        double[] vetorDistanciaIdeaIN = new double[alternativas.length];
         double soma, subtracao;
-        for (int i = 0; i < matrizSeparacaoIdealN.length; i++) {
+        for (int i = 0; i < vetorDistanciaIdeaIN.length; i++) {
             soma = 0;
             subtracao = 0;
             for (int j = 0; j < mPesada.length; j++) {
-                subtracao = mPesada[i][j] - matrizSolucao[1][j];
+                subtracao = mPesada[i][j] - mValoresIdeais[1][j];
                 soma = (Math.pow(subtracao, 2)) + soma;
             }
-            matrizSeparacaoIdealN[i] = Math.sqrt(soma);
+            vetorDistanciaIdeaIN[i] = Math.sqrt(soma);
         }
-        return matrizSeparacaoIdealN;
+        return vetorDistanciaIdeaIN;
     }
 
     /**
@@ -399,42 +509,6 @@ public class MetodoTOPSIS {
         }
     }
 
-    public static void selecaoOutput(String output, String[] beneficios, String[] custos, String[] criterios, String[][] totalInput, String[] alternativas, double[] pesos, double[][] mCriterios, double[][] mNorm, double[][] mPesada, double[][] matrizSolucao, double[] matrizSeparacaoIdealP, double[] matrizSeparacaoIdealN, double[] vetorPrioridadeComposta, String[] melhorOpcao, int nLinhas) {
-        int nLinhasOutput = 0;
-        String[][] matrizTotalOutput=new String[][];
-        printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
-        nLinhasOutput=juntarDados(matrizTotal)
-    }
-
-    public static int juntarDados(String[][] matrizTotal, int nLinhasOutput, int op, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa) {
-        int nColuna = 0;
-        for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
-            if (nMatriz == 0) {
-                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
-                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(matrizCriterios, op), nLinhasOutput);
-                nLinhasOutput++;
-            } else {
-                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
-                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(identificarMatriz(matrizTotalCriterios, nMatriz - 1, N_ALTERNATIVAS), op), nLinhasOutput);
-                nLinhasOutput++;
-            }
-        }
-        for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
-            if (nMatriz == 0) {
-                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
-                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(matrizCriteriosNormalizada, op), nLinhasOutput);
-                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
-                nLinhasOutput++;
-            } else {
-                nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
-                nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(identificarMatriz(matrizTotalNormalizacao, nMatriz - 1, N_ALTERNATIVAS), op), nLinhasOutput);
-                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
-                nLinhasOutput++;
-            }
-        }
-        return nLinhasOutput;
-    }
-    
     public static void printConsola(String[][] totalInput, int nLinhas, double[][] mPesada, double[] vetorPrioridadeComposta, String[] melhorOpcao) {
         printMatrizStringInput(MetodoAHP.eliminarNull(totalInput), nLinhas);
         System.out.println(" ");
@@ -450,69 +524,29 @@ public class MetodoTOPSIS {
         System.out.println("Pontuação: " + melhorOpcao[1]);
     }
 
-    public static void guardarOutputTotalTXT(String output, String[] beneficios, String[] custos, String[] criterios, String[][] totalInput, String[] alternativas, double[] pesos, double[][] mCriterios, double[][] mNorm, double[][] mPesada, double[][] matrizSolucao, double[] matrizSeparacaoIdealP, double[] matrizSeparacaoIdealN, double[] vetorPrioridadeComposta, String[] melhorOpcao, int nLinhas) throws FileNotFoundException {
+    public static void guardarOutputTotalTXT(String output, String[] criterios, String[] alternativas, double[] pesos, double[][] mCriterios, double[][] mNorm, double[][] mPesada, double[][] mValoresIdeais, double[] matrizSeparacaoIdealP, double[] matrizSeparacaoIdealN, double[] vetorPrioridadeComposta, String[] melhorOpcao) throws FileNotFoundException {
         Formatter out = new Formatter(new File(output));
-        for (int i = 0; i < nLinhasOutput; i++) {
-            for (int j = 0; j < matrizTotal[i].length; j++) {
-                out.format("%20s", matrizTotal[i][j]);
-            }
-            out.format("%n");
-        }
-        if (confirmacaoDadosIrrelevantes(posicaoDadosIrrelevantes) == true) {
-            out.format("%25s", "Atributos Ignorados:");
-            out.format("%n");
-            for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
-                if (posicaoDadosIrrelevantes[i] != null) {
-                    out.format("%25s", posicaoDadosIrrelevantes[i]);
-                }
-            }
-        }
+        printVectorTxt(out, "Vetor Pesos", criterios, pesos);
         out.format("%n");
-        /*out.format("%25s", "RC");
-        out.format("%25s", "Valor Próprio Máx");
-        out.format("%25s", "IR");
-        out.format("%n");
-        for (int a = 0; a < RCValues.length; a++) {
-            for (int b = 0; b < RCValues[a].length; b++) {
-                out.format("%25s", (a + 1) + " : " + (double) Math.round(RCValues[a][b] * 1000) / 1000);
-            }
-            out.format("%n");
-        }*/
-        out.format("%25s", "Vetor Distancia a Solução Ideal");
-        out.format("%n");
-        for (int a = 0; a < alternativas.length; a++) {
-            out.format("%25s", "   " + alternativas[a]);
-        }
-        out.format("%n");
-        for (int a = 0; a < matrizSeparacaoIdealP.length; a++) {
-            out.format("%25s", "   " + matrizSeparacaoIdealP[a]);
-        }
-        out.format("%25s", "Vetor Distancia a Solução Ideal");
-        out.format("%n");
-        for (int a = 0; a < alternativas.length; a++) {
-            out.format("%25s", "   " + alternativas[a]);
-        }
-        out.format("%n");
-        for (int a = 0; a < matrizSeparacaoIdealP.length; a++) {
-            out.format("%25s", "   " + matrizSeparacaoIdealP[a]);
-        }
-        printVectorTxt(out, "Solucoes Ideais", criterios, matrizSolucao[0]);
-        out.format("%n");
-        printVectorTxt(out, "Solucoes Ideais Negativos", criterios, matrizSolucao[1]);
-        out.format("%n");
+        printMatrizTxt(out, mCriterios, alternativas, criterios, "Matriz Criterios");
+        printMatrizTxt(out, mNorm, alternativas, criterios, "Matriz Normalizada");
+        printMatrizTxt(out, mPesada, alternativas, criterios, "Matriz Normalizada Pesada");
+        printVectorTxt(out, "Solucoes Ideais", criterios, mValoresIdeais[0]);
+        printVectorTxt(out, "Solucoes Ideais Negativas", criterios, mValoresIdeais[1]);
         printVectorTxt(out, "Vetor Distancia a Solução Ideal", alternativas, matrizSeparacaoIdealP);
-        out.format("%n");
         printVectorTxt(out, "Vetor Distancia a Solução Ideal Negativa", alternativas, matrizSeparacaoIdealN);
-        out.format("%n");
         printVectorTxt(out, "Vetor Prioridade Relativa // Pontuação Final", alternativas, vetorPrioridadeComposta);
         out.format("%n");
         out.format("Melhor Alternativa");
+        out.format("%n");
         out.format("Nome: " + melhorOpcao[0]);
+        out.format("%n");
         out.format("Pontuação: " + melhorOpcao[1]);
         out.close();
     }
 
     public static void printVectorTxt(Formatter out, String titulo, String[] cabecalho, double[] vetor) {
+        out.format("%n");
         out.format("%25s", titulo);
         out.format("%n");
         for (int a = 0; a < cabecalho.length; a++) {
@@ -520,7 +554,32 @@ public class MetodoTOPSIS {
         }
         out.format("%n");
         for (int a = 0; a < vetor.length; a++) {
-            out.format("%25s", " | " + vetor[a]);
+            out.format("%25s", "   " + vetor[a]);
         }
+        out.format("%n");
+    }
+
+    public static void printMatrizTxt(Formatter out, double[][] matriz, String[] alt, String[] crt, String mNome) {
+        String[][] mOutput = new String[matriz.length + 1][matriz[0].length + 1];
+        mOutput[0][0] = mNome;
+        for (int i = 0; i < mOutput.length - 1; i++) {
+            mOutput[0][i + 1] = crt[i];
+        }
+        for (int i = 0; i < mOutput[0].length - 1; i++) {
+            mOutput[i + 1][0] = alt[i];
+        }
+        for (int i = 0; i < mOutput.length - 1; i++) {
+            for (int j = 0; j < mOutput[0].length - 1; j++) {
+                mOutput[i + 1][j + 1] = String.valueOf(matriz[i][j]);
+            }
+
+        }
+        for (int i = 0; i < mOutput.length; i++) {
+            for (int j = 0; j < mOutput[0].length; j++) {
+                out.format("%25s", mOutput[i][j]);
+            }
+            out.format("%n");
+        }
+        out.format("%n");
     }
 }
