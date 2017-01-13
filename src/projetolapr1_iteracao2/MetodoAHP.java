@@ -844,7 +844,7 @@ public class MetodoAHP {
         out.format("%n");
         for (int a = 0; a < escolhas.length; a++) {
             for (int b = 0; b < escolhas[a].length; b++) {
-                out.format("%20s", " " + m_cabecalhos[1][melhorEscolha] + " : " + (double) Math.round(escolhas[a][b] * 100) / 100);
+                out.format("%20s", " " + m_cabecalhos[1][b] + " : " + (double) Math.round(escolhas[a][b] * 100) / 100);
             }
             out.format("%n");
         }
