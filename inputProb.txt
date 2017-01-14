@@ -1,0 +1,25 @@
+mc_criterios  Data  Duração  Gravidade  Urgência
+1  1 1/8 1/7
+1  1  1/8  1/7
+8 8 1 2
+7 7 1/2 1
+
+mcp_Data  H  R  S
+1 1/3 1
+3 1 3
+1 1/3 1
+
+mcp_Duração  H  R  S
+1 1/2 1/3
+2 1 1/3
+3 3 1
+
+mcp_Gravidade  H  R  S
+1 1/5 1/2
+5 1 3
+2 1/3 1
+
+mcp_Urgência  H  R  S
+1 5 2
+1/5 1 1/3
+1/2 3 1

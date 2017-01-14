@@ -33,7 +33,8 @@ public class MetodoTOPSIS {
         //String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt"; Testes
         String[] custos, criterios, alternativas, melhorOpcao, faltaCustos = {"crt_custo", "777"};
         int nLinhas = 0, nElementos = 0, a = 0;
-        nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
+        //nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
+         nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
         if (nLinhas < 7) {
             gravarErros(FILE_LOG_ERROS_Dados3, "0");
         } else {
@@ -71,8 +72,8 @@ public class MetodoTOPSIS {
                             mNorm = matrizNormalizada(mCriterios, alternativas, criterios);
                             mPesada = matrizPesada(mNorm, pesos);
                             mValoresIdeais = selectSolucoes(mPesada, criterios, custos);
-                            vetorDistanciaIdealP = detDistanciaIdealP(mPesada, criterios, alternativas, mValoresIdeais);
-                            vetorDistanciaIdeaIN = detDistanciaIdealN(mPesada, criterios, alternativas, mValoresIdeais);
+                            vetorDistanciaIdealP = detDistanciaIdealP(mPesada, alternativas, criterios, mValoresIdeais);
+                            vetorDistanciaIdeaIN = detDistanciaIdealN(mPesada, alternativas, criterios, mValoresIdeais);
                             vetorPrioridadeComposta = vetorSolucao(vetorDistanciaIdealP, vetorDistanciaIdeaIN, alternativas);
                             melhorOpcao = melhorAlternativa(vetorPrioridadeComposta, alternativas);
                             printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
@@ -272,9 +273,9 @@ public class MetodoTOPSIS {
      * de acordo com cada critério
      */
     public static double[][] criarMatrizCriterios(String[][] totalInput, String[] alternativas, String[] criterios, int a) {
-        double[][] mCriterios = new double[criterios.length][alternativas.length];
-        for (int i = 0; i < mCriterios.length; i++) {
-            for (int j = 0; j < mCriterios[i].length; j++) {
+        double[][] mCriterios = new double[alternativas.length][criterios.length];
+        for (int i = 0; i < alternativas.length; i++) {
+            for (int j = 0; j < criterios.length; j++) {
                 mCriterios[i][j] = Double.parseDouble(totalInput[i + 7 + a][j]);
             }
         }
@@ -292,9 +293,9 @@ public class MetodoTOPSIS {
      * somatorio dos seus quadrados
      */
     public static double[][] matrizNormalizada(double[][] mCriterios, String[] alternativas, String[] criterios) {
-        double temp[][] = new double[criterios.length][alternativas.length];
-        for (int i = 0; i < temp.length; i++) {
-            for (int j = 0; j < temp[1].length; j++) {
+        double temp[][] = new double[alternativas.length][criterios.length];
+        for (int i = 0; i < alternativas.length; i++) {
+            for (int j = 0; j < criterios.length; j++) {
                 temp[i][j] = Math.pow(mCriterios[i][j], 2);
             }
         }
@@ -315,9 +316,9 @@ public class MetodoTOPSIS {
         double soma;
         double[] somatorio = new double[temp[0].length];
         double[][] temp1 = new double[temp.length][temp[0].length];
-        for (int i = 0; i < temp.length; i++) {
+        for (int i = 0; i < temp[0].length; i++) {
             soma = 0;
-            for (int j = 0; j < temp[i].length; j++) {
+            for (int j = 0; j < temp.length; j++) {
                 soma = soma + temp[j][i];
             }
             somatorio[i] = Math.sqrt(soma);
@@ -361,7 +362,7 @@ public class MetodoTOPSIS {
     public static double[][] selectSolucoes(double[][] mPesada, String[] criterios, String[] custos) {
         double[][] mValoresIdeais = new double[2][criterios.length];
         double ideal, idealNEG;
-        for (int i = 0; i < mPesada.length; i++) {
+        for (int i = 0; i < mPesada[0].length; i++) {
             ideal = 0;
             idealNEG = 100000;
             for (int j = 0; j < mPesada.length; j++) {
@@ -581,10 +582,10 @@ public class MetodoTOPSIS {
     public static void printMatrizTxt(Formatter out, double[][] matriz, String[] alt, String[] crt, String mNome) {
         String[][] mOutput = new String[matriz.length + 1][matriz[0].length + 1];
         mOutput[0][0] = mNome;
-        for (int i = 0; i < mOutput.length - 1; i++) {
+        for (int i = 0; i < mOutput[0].length - 1; i++) {
             mOutput[0][i + 1] = crt[i];
         }
-        for (int i = 0; i < mOutput[0].length - 1; i++) {
+        for (int i = 0; i < mOutput.length - 1; i++) {
             mOutput[i + 1][0] = alt[i];
         }
         for (int i = 0; i < mOutput.length - 1; i++) {
