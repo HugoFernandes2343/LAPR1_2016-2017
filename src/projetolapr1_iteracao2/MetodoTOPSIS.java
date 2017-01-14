@@ -13,6 +13,11 @@ import java.lang.Math;/*
 
 public class MetodoTOPSIS {
 
+    private final static String FILE_LOG_ERROS_Dados1 = "Identificadores de linha não encontrados";
+    private final static String FILE_LOG_ERROS_Dados2 = "Identificadores de vetor pesos incompletos";
+    private final static String FILE_LOG_ERROS_Dados3 = "Numero de alternativas insuficiente";
+    private final static String FILE_LOG_ERROS_Dados4 = "Numero de criterios insuficientes";
+
     /**
      * @param args the command line arguments
      */
@@ -21,20 +26,18 @@ public class MetodoTOPSIS {
         double[][] mCriterios, mNorm, mPesada, mValoresIdeais;
         String[][] totalInput = new String[100][50];
         String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt";
-        String[] beneficios, custos, criterios, alternativas, melhorOpcao, faltaCustos = {"crt_custo", "777"};
+        String[] custos, criterios, alternativas, melhorOpcao, faltaCustos = {"crt_custo", "777"};
         int nLinhas = 0, nElementos = 0, a = 0;
-        nLinhas=LerFicheiroInput(nomeFich, totalInput, nLinhas);
+        nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
         if (nLinhas < 7) {
-            //logErros
+            gravarErros(FILE_LOG_ERROS_Dados3, "0");
         } else {
             if (!totalInput[0][0].equals("crt_beneficio") || !totalInput[1][0].equals("crt_custo")) {
-                //logErros
+                 gravarErros(FILE_LOG_ERROS_Dados1, "1 ou 2");
             } else {
-                nElementos = encontrarNEelementos(totalInput[0]);
-                beneficios = comporArray(totalInput[0], nElementos);
                 nElementos = encontrarNEelementos(totalInput[1]);
                 if (nElementos == 0) {
-                    custos = comporArray(faltaCustos, nElementos+1);
+                    custos = comporArray(faltaCustos, nElementos + 1);
                 } else {
                     custos = comporArray(totalInput[1], nElementos);
                 }
@@ -42,14 +45,14 @@ public class MetodoTOPSIS {
                 if (totalInput[2][0].equals("vec_pesos") && totalInput[3][0].contains(".")) {
                     nElementos = encontrarNEelementos(totalInput[2]);
                     pesos = gravarVetorPesos(totalInput[3], nElementos);
-                } else if (totalInput[2][0].equals("md_alt_crt") && totalInput[3][0].equals("crt")) {
+                } else if (totalInput[2][0].equals("md_crt_alt") && totalInput[3][0].equals("crt")) {
                     nElementos = encontrarNEelementos(totalInput[3]);
                     a = -2;
                     if (nElementos > 1) {
                         System.out.println("Vetor Pesos não introduzido");
                         pesos = criarVetorPesos(nElementos);
                     } else {
-                        //logErros
+                        gravarErros(FILE_LOG_ERROS_Dados4, " 3 ");
                     }
                 }
 
@@ -60,7 +63,6 @@ public class MetodoTOPSIS {
                         if (totalInput[6 + a][0].equals("alt")) {
                             nElementos = encontrarNEelementos(totalInput[6 + a]);
                             alternativas = comporArray(totalInput[6 + a], nElementos);
-                            //beneficios = comporArray(totalInput[0], nElementos);
                             mCriterios = criarMatrizCriterios(totalInput, alternativas, criterios, a);
                             mNorm = matrizNormalizada(mCriterios, alternativas, criterios);
                             mPesada = matrizPesada(mNorm, pesos);
@@ -72,19 +74,31 @@ public class MetodoTOPSIS {
                             printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
                             guardarOutputTotalTXT(output, criterios, alternativas, pesos, mCriterios, mNorm, mPesada, mValoresIdeais, vetorDistanciaIdealP, vetorDistanciaIdeaIN, vetorPrioridadeComposta, melhorOpcao);
                         } else {
-                            //logErros
+                           gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(6+a));
                         }
                     } else {
-                        //logErros    
+                         gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(5+a));;
                     }
                 } else {
-                    //logErros
+                   gravarErros(FILE_LOG_ERROS_Dados2, "0");
                 }
 
             }
 
         }
 
+    }
+
+    public static void gravarErros(String erro, String linha) throws FileNotFoundException {
+        Formatter log = new Formatter(new File("ErrosTOPSIS.txt"));
+        if (linha.equals("0")) {
+            log.format(erro);
+            System.out.println(erro);
+        } else {
+            log.format(erro + " na linha " + linha);
+            System.out.println(erro + " na linha " + linha);
+        }
+        log.close();
     }
 
     /**
@@ -186,7 +200,7 @@ public class MetodoTOPSIS {
     public static double[] criarVetorPesos(int nCriterios) {
         double[] pesos = new double[nCriterios];
         double peso = 0;
-        peso = 1 / nCriterios;
+        peso = ((double) 1 / nCriterios);
         for (int i = 0; i < pesos.length; i++) {
             pesos[i] = peso;
 

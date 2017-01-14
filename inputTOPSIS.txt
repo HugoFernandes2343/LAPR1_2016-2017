@@ -1,6 +1,6 @@
-crt_beneficio  Estilo  Confiabilidade  Consumo
-crt_custo  Custo
-
+crt_beneficio  Estilo  Confiabilidade  Consumo  Custo
+crt_custo 
+ 
 vec_pesos  Estilo  Confiabilidade  Consumo  Custo
 0.1 0.4 0.3 0.2
 
