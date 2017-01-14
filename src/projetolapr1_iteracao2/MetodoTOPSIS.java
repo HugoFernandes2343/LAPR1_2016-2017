@@ -422,7 +422,7 @@ public class MetodoTOPSIS {
         for (int i = 0; i < vetorDistanciaIdealP.length; i++) {
             subtracao = 0;
             soma = 0;
-            for (int j = 0; j < mPesada.length; j++) {
+            for (int j = 0; j < mPesada[0].length; j++) {
                 subtracao = mPesada[i][j] - mValoresIdeais[0][j];
                 soma = (Math.pow(subtracao, 2)) + soma;
             }
@@ -448,7 +448,7 @@ public class MetodoTOPSIS {
         for (int i = 0; i < vetorDistanciaIdeaIN.length; i++) {
             soma = 0;
             subtracao = 0;
-            for (int j = 0; j < mPesada.length; j++) {
+            for (int j = 0; j < mPesada[0].length; j++) {
                 subtracao = mPesada[i][j] - mValoresIdeais[1][j];
                 soma = (Math.pow(subtracao, 2)) + soma;
             }
