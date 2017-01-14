@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.Formatter;
 import java.io.FileNotFoundException;
-import java.lang.Math;/*
+import java.lang.Math;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -13,19 +16,21 @@ import java.lang.Math;/*
 
 public class MetodoTOPSIS {
 
+    public static Calendar Data = Calendar.getInstance();
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("dd_MM_yyyy HH.mm.ss");/*Windows nao permite : como caracter*/
+    private static final String FILE_LOG_ERROS = SDF.format(Data.getTime()) + ".txt";
     private final static String FILE_LOG_ERROS_Dados1 = "Identificadores de linha não encontrados";
     private final static String FILE_LOG_ERROS_Dados2 = "Identificadores de vetor pesos incompletos";
     private final static String FILE_LOG_ERROS_Dados3 = "Numero de alternativas insuficiente";
     private final static String FILE_LOG_ERROS_Dados4 = "Numero de criterios insuficientes";
-
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(/*String[] args*/String nomeFich, String output) throws FileNotFoundException {
         double[] pesos = null, vetorDistanciaIdeaIN, vetorDistanciaIdealP, vetorPrioridadeComposta;
         double[][] mCriterios, mNorm, mPesada, mValoresIdeais;
         String[][] totalInput = new String[100][50];
-        String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt";
+        //String nomeFich = "inputTOPSIS.txt", output = "outputTOPSIS.txt"; Testes
         String[] custos, criterios, alternativas, melhorOpcao, faltaCustos = {"crt_custo", "777"};
         int nLinhas = 0, nElementos = 0, a = 0;
         nLinhas = LerFicheiroInput(nomeFich, totalInput, nLinhas);
@@ -33,7 +38,7 @@ public class MetodoTOPSIS {
             gravarErros(FILE_LOG_ERROS_Dados3, "0");
         } else {
             if (!totalInput[0][0].equals("crt_beneficio") || !totalInput[1][0].equals("crt_custo")) {
-                 gravarErros(FILE_LOG_ERROS_Dados1, "1 ou 2");
+                gravarErros(FILE_LOG_ERROS_Dados1, "1 ou 2");
             } else {
                 nElementos = encontrarNEelementos(totalInput[1]);
                 if (nElementos == 0) {
@@ -41,7 +46,6 @@ public class MetodoTOPSIS {
                 } else {
                     custos = comporArray(totalInput[1], nElementos);
                 }
-
                 if (totalInput[2][0].equals("vec_pesos") && totalInput[3][0].contains(".")) {
                     nElementos = encontrarNEelementos(totalInput[2]);
                     pesos = gravarVetorPesos(totalInput[3], nElementos);
@@ -74,13 +78,13 @@ public class MetodoTOPSIS {
                             printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
                             guardarOutputTotalTXT(output, criterios, alternativas, pesos, mCriterios, mNorm, mPesada, mValoresIdeais, vetorDistanciaIdealP, vetorDistanciaIdeaIN, vetorPrioridadeComposta, melhorOpcao);
                         } else {
-                           gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(6+a));
+                            gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(6 + a));
                         }
                     } else {
-                         gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(5+a));;
+                        gravarErros(FILE_LOG_ERROS_Dados1, Double.toString(5 + a));;
                     }
                 } else {
-                   gravarErros(FILE_LOG_ERROS_Dados2, "0");
+                    gravarErros(FILE_LOG_ERROS_Dados2, "0");
                 }
 
             }
@@ -90,7 +94,7 @@ public class MetodoTOPSIS {
     }
 
     public static void gravarErros(String erro, String linha) throws FileNotFoundException {
-        Formatter log = new Formatter(new File("ErrosTOPSIS.txt"));
+        Formatter log = new Formatter(new File(FILE_LOG_ERROS));
         if (linha.equals("0")) {
             log.format(erro);
             System.out.println(erro);
@@ -517,10 +521,11 @@ public class MetodoTOPSIS {
     private static void printMatrizStringInput(String[][] matriz, int nLinhas) {
         for (int i = 0; i < nLinhas + 3; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
-                System.out.printf("%25s", matriz[i][j]);
+                System.out.printf("%18s", matriz[i][j]);
             }
-            System.out.println("");
+            System.out.println(" ");
         }
+        System.out.println(" ");
     }
 
     public static void printConsola(String[][] totalInput, int nLinhas, double[][] mPesada, double[] vetorPrioridadeComposta, String[] melhorOpcao) {

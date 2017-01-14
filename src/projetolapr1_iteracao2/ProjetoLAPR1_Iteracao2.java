@@ -47,10 +47,10 @@ public class ProjetoLAPR1_Iteracao2 {
                 String Output = args[2];
                 MetodoAHP.main(limiarCriterio, limiarRC, Input, Output);
             }
-            /*}else if(metodo.equals("-M2")){
+        }else if(metodo.equals("-M2")){
             String Input=args[1];
             String Output=args[2];
-            MetodoTOPSIS.main(Input,Output);/*Só no final do code é que se implementa*/
+            MetodoTOPSIS.main(Input,Output);//Só no final do code é que se implementa
         }
     }
 

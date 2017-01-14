@@ -87,7 +87,6 @@ public class MetodoAHP {
             System.err.println("Erro encontrado: " + erro.getMessage());//.getMessage vai buscar a detailedMessage da Exception
             log.close();
             System.exit(0);//.exit usas-se 0 porque é suposto darmos a execução como bem sucedida apesar do ficheiro nao ser encontrado, senao usamos valor 1
-            throw erro;
         }
         return nLinhas;
     }
