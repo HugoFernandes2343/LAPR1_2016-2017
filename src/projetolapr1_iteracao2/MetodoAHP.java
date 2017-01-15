@@ -20,13 +20,13 @@ public class MetodoAHP {
     private static final SimpleDateFormat SDF = new SimpleDateFormat("dd_MM_yyyy HH.mm.ss");/*Windows nao permite : como caracter*/
     private static final String FILE_LOG_ERROS = SDF.format(Data.getTime()) + ".txt";
     public static String[] posicaoDadosIrrelevantes;
-    public static String[][] matrizTotalInput = new String[50][100], m_cabecalhos = null;
+    public static String[][] matrizTotalInput = new String[100][100], m_cabecalhos = null;
     public static double[][] matrizTotalCriterios = null, matrizSomatorios = null, matrizCriterios = null, matrizCriteriosNormalizada = null, matrizTotalNormalizacao = null, mPrioridadeRelativa = null, RCValues = null;
 
     public static void main(/*String[] args*/double limiarCriterio, double limiarRC, String Input, String Output) throws FileNotFoundException {
-        //String Input = "DadosInputAHP.txt", Output = "DadosOutputAHPIt2.txt";//ExemploTeste
+        //String Input = "DadosInput.txt", Output = "DadosOutputAHPIt2.txt";//ExemploTeste
         int nLinhas, op;
-        //double limiarCriterio = 0.2, limiarRC = 0.05;//ExemploTeste
+        //double limiarCriterio = 0.0, limiarRC = 0.05;//ExemploTeste
         Formatter logErros = new Formatter(new File(FILE_LOG_ERROS));
         do {
             op = menu();
@@ -44,12 +44,12 @@ public class MetodoAHP {
             mPrioridadeRelativa = prioridadeRelativa(mPrioridadeRelativa, matrizCriteriosNormalizada, matrizTotalNormalizacao, N_CRITERIOS, N_ALTERNATIVAS);
             switch (op) {
                 case 1:
-                    RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
-                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio);
+                    RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios,logErros);
+                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio,logErros);
                     break;
                 case 2:
-                    RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
-                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio);
+                    RCValues = verificarConsistencia(op, RCValues, mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios,logErros);
+                    selecaoOutput(Output, op, RCValues, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa, limiarRC, limiarCriterio,logErros);
                     break;
                 case 0:
                     System.exit(0);
@@ -160,7 +160,15 @@ public class MetodoAHP {
 
     public static String[][] criarMatrizCabecalhos(String[][] matrizInputTotal, double[][] matrizCriterios, int N_CRITERIOS, int N_ALTERNATIVAS, int nLinhas, String[][] m_cabecalhos) {
         int p = 0, j, k;
-        m_cabecalhos = new String[N_CRITERIOS + 1][N_ALTERNATIVAS + 1];
+        m_cabecalhos = new String[N_CRITERIOS + 1][];
+        for (int i = 0; i < N_CRITERIOS + 1; i++) {
+            if (i == 0) {
+                m_cabecalhos[i] = new String[N_CRITERIOS + 1];
+            } else {
+                m_cabecalhos[i] = new String[N_ALTERNATIVAS + 1];
+            }
+        }
+
         for (j = 0; j < nLinhas; j++) {
             if (matrizInputTotal[j][0].contains("mc")) {
                 for (k = 0; k < m_cabecalhos[p].length; k++) {
@@ -245,7 +253,14 @@ public class MetodoAHP {
 
     /*Calcular prioridade relativa*/
     public static double[][] prioridadeRelativa(double[][] mPrioridadeRelativa, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, int N_CRITERIOS, int N_ALTERNATIVAS) {
-        mPrioridadeRelativa = new double[N_CRITERIOS + 1][N_ALTERNATIVAS];
+        mPrioridadeRelativa = new double[N_CRITERIOS + 1][];
+        for (int i = 0; i < N_CRITERIOS + 1; i++) {
+            if (i == 0) {
+                mPrioridadeRelativa[i] = new double[N_CRITERIOS];
+            } else {
+                mPrioridadeRelativa[i] = new double[N_ALTERNATIVAS];
+            }
+        }
         for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
             if (nMatriz == 0) {
                 mPrioridadeRelativa = prioridadeLinhas(matrizCriteriosNormalizada, nMatriz, mPrioridadeRelativa);
@@ -271,7 +286,7 @@ public class MetodoAHP {
             for (j = 0; j < matriz[i].length; j++) {
                 somaTemp = somaTemp + matriz[i][j];
             }
-            mPrioridadeRelativa[i][nMatriz] = somaTemp / matriz[i].length;
+            mPrioridadeRelativa[nMatriz][i] = somaTemp / matriz[i].length;
             somaTemp = 0;
         }
         return mPrioridadeRelativa;
@@ -289,33 +304,34 @@ public class MetodoAHP {
      * todos os criterios
      * @return
      */
-    public static double[][] verificarConsistencia(int op, double[][] RCValues, double[][] mPrioridadeRelativa, double[][] matrizCriterios, double[][] matrizTotalCriterios) {
+    public static double[][] verificarConsistencia(int op, double[][] RCValues, double[][] mPrioridadeRelativa, double[][] matrizCriterios, double[][] matrizTotalCriterios,Formatter log) {
         if (op == 1) {
-            RCValues = RCManualCheck(mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
+            RCValues = RCManualCheck(mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios,log);
         } else if (op == 2) {
-            RCValues = RCAutoCheck(mPrioridadeRelativa, matrizCriterios, matrizTotalCriterios);
+            RCValues = RCAutoCheck(matrizCriterios, matrizTotalCriterios);
         }
         System.out.println(" ");
         return RCValues;
     }
 
     /**
-     * Calcular RC/IR/Valores Próprios de forma aproximada
+     * Calcular RC/Valores Próprios/IR de forma aproximada
      *
      * @return
      */
-    public static double[][] RCManualCheck(double[][] mPrioridadeRelativa, double[][] matrizCriterios, double[][] matrizTotalCriterios) {
+    public static double[][] RCManualCheck(double[][] mPrioridadeRelativa, double[][] matrizCriterios, double[][] matrizTotalCriterios,Formatter log) {
         double[][] cPrioridade;
         double[][] RCValues = new double[N_CRITERIOS + 1][3];//RCValues[][3], o 3 refere-se ao numero de colunas: RC,Valor Proprio,IR
         for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
             if (nMatriz == 0) {
                 cPrioridade = new double[N_CRITERIOS][1];
                 cPrioridade = encontrarColuna(mPrioridadeRelativa, cPrioridade, nMatriz);
-                RCValues[nMatriz][0] = determinarManualRC(matrizCriterios, cPrioridade, nMatriz, RCValues);
+                RCValues[nMatriz][0] = determinarManualRC(matrizCriterios, cPrioridade, nMatriz, RCValues,log);
+                //RCValues[nMatriz][0] = determinarManualRC(matrizCriterios, mPrioridadeRelativa[nMatriz], nMatriz, RCValues);
             } else {
                 cPrioridade = new double[N_ALTERNATIVAS][1];
                 cPrioridade = encontrarColuna(mPrioridadeRelativa, cPrioridade, nMatriz);
-                RCValues[nMatriz][0] = determinarManualRC(identificarMatriz(matrizTotalCriterios, nMatriz - 1, N_ALTERNATIVAS), cPrioridade, nMatriz, RCValues);
+                RCValues[nMatriz][0] = determinarManualRC(identificarMatriz(matrizTotalCriterios, nMatriz - 1, N_ALTERNATIVAS), cPrioridade, nMatriz, RCValues,log);
             }
         }
         return RCValues;
@@ -323,12 +339,12 @@ public class MetodoAHP {
 
     private static double[][] encontrarColuna(double[][] mPrioridadeRelativa, double[][] cPrioridade, int nMatriz) {
         if (nMatriz == 0) {
-            for (int i = 0; i < mPrioridadeRelativa.length - 1; i++) {
-                cPrioridade[i][0] = mPrioridadeRelativa[i][nMatriz];
+            for (int i = 0; i < N_CRITERIOS; i++) {
+                cPrioridade[i][0] = mPrioridadeRelativa[nMatriz][i];
             }
         } else if (nMatriz != 0) {
-            for (int i = 0; i < mPrioridadeRelativa.length; i++) {
-                cPrioridade[i][0] = mPrioridadeRelativa[i][nMatriz];
+            for (int i = 0; i < N_ALTERNATIVAS; i++) {
+                cPrioridade[i][0] = mPrioridadeRelativa[nMatriz][i];
             }
         }
         return cPrioridade;
@@ -344,11 +360,11 @@ public class MetodoAHP {
      * do RC, na segunda o maior valor p´roprio e na terceira o IR
      * @return
      */
-    public static double determinarManualRC(double[][] matriz, double[][] cPrioridade, int nMatriz, double[][] RCValues) {
+    public static double determinarManualRC(double[][] matriz, double[][] cPrioridade, int nMatriz, double[][] RCValues,Formatter log) {
         double RC;
         double lambdaMax = 0;
         double IC, IR;
-        lambdaMax = determinarLambdaMax(lambdaMax, matriz, cPrioridade, nMatriz);
+        lambdaMax = determinarLambdaMax(lambdaMax, matriz, cPrioridade, nMatriz,log);
         RCValues[nMatriz][1] = lambdaMax;
         IC = (lambdaMax - matriz.length) / (matriz.length - 1);
         IR = RandomConsistency[matriz.length - 1];
@@ -366,21 +382,29 @@ public class MetodoAHP {
      * @param nMatriz Flag que identifica a matriz
      * @return
      */
-    public static double determinarLambdaMax(double lambdaMax, double[][] matriz, double[][] cPrioridade, int nMatriz) {
+    public static double determinarLambdaMax(double lambdaMax, double[][] matriz, double[][] cPrioridade, int nMatriz, Formatter log) {
         double[][] matrizTemp;
-        matrizTemp = calcularMultiplicacao(matriz, cPrioridade);
+        matrizTemp = calcularMultiplicacao(matriz, cPrioridade, log);
         lambdaMax = calcularDiv(matrizTemp, cPrioridade, lambdaMax);
         return lambdaMax;
     }
 
-    private static double[][] calcularMultiplicacao(double[][] matriz1, double[][] matriz2) {
+    private static double[][] calcularMultiplicacao(double[][] matriz1, double[][] matriz2, Formatter log) {
         double[][] matrizTemp = new double[matriz1.length][matriz2[0].length];
-        for (int i = 0; i < matriz1.length; i++) {
-            for (int j = 0; j < matriz2[0].length; j++) {
-                for (int k = 0; k < matriz1[i].length; k++) {
-                    matrizTemp[i][j] += (matriz1[i][k] * matriz2[k][j]);
+        try {
+            for (int i = 0; i < matriz1.length; i++) {
+                for (int j = 0; j < matriz2[0].length; j++) {
+                    for (int k = 0; k < matriz1[i].length; k++) {
+                        matrizTemp[i][j] += (matriz1[i][k] * matriz2[k][j]);
+                    }
                 }
             }
+        } catch (ArrayIndexOutOfBoundsException erro) {
+            log.format("Erro encontrado: ");
+            log.format(erro.getMessage());
+            System.err.println("Erro encontrado: " + erro.getMessage());//.getMessage vai buscar a detailedMessage da Exception
+            log.close();
+            System.exit(0);
         }
         return matrizTemp;
     }
@@ -391,7 +415,7 @@ public class MetodoAHP {
             somaTemp += matrizTemp[i][0] / cPrioridade[i][0];
         }
         lambdaMax = somaTemp / matrizTemp.length;
-        return lambdaMax;
+        return lambdaMax; //Data:3
     }
 
     /**/
@@ -400,7 +424,7 @@ public class MetodoAHP {
      *
      * @return
      */
-    public static double[][] RCAutoCheck(double[][] mPrioridadeRelativa, double[][] matrizCriterios, double[][] matrizTotalCriterios) {
+    public static double[][] RCAutoCheck(double[][] matrizCriterios, double[][] matrizTotalCriterios) {
         double[][] RCValues = new double[N_CRITERIOS + 1][3];
         Matrix matriz;
         double[][] matrizValores = null;
@@ -494,21 +518,21 @@ public class MetodoAHP {
      * @param limiarCriterio limiar definido pelo utilizador para os pesos
      * @throws FileNotFoundException
      */
-    public static void selecaoOutput(String Output, int op, double[][] RCValues, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa, double limiarRC, double limiarCriterio) throws FileNotFoundException {
+    public static void selecaoOutput(String Output, int op, double[][] RCValues, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa, double limiarRC, double limiarCriterio,Formatter log) throws FileNotFoundException {
         double escolhas[][];
-        String[][] matrizTotal = new String[100][N_ALTERNATIVAS + 2];//o "2" é a adiçao às colunas das alternativas as colunas do cabecalhos e prioridade relativa
+        String[][] matrizTotal = new String[100][100];
         int nLinhasOutput = 0;
         nLinhasOutput = juntarDados(matrizTotal, nLinhasOutput, op, matrizCriterios, m_cabecalhos, matrizTotalCriterios, matrizSomatorios, matrizCriteriosNormalizada, matrizTotalNormalizacao, mPrioridadeRelativa);
         matrizTotal = eliminarNull(matrizTotal);
         printMatrizTotalInput(matrizTotal, nLinhasOutput);
         for (int i = 0; i < RCValues.length; i++) {
             if (RCValues[i][0] > limiarRC) {
-                System.out.println("Os valores das prioridades relativas da matriz " + m_cabecalhos[i][0] + " inserida no input não são consistentes, RC:" + RCValues[i][0]);
+                System.out.println("Os valores da matriz " + m_cabecalhos[i][0] + " inserida no input não são consistentes, RC:" + RCValues[i][0]);
             } else if (RCValues[i][0] <= 0.1) {
-                System.out.println("Os valores das prioridades relativas da matriz " + m_cabecalhos[i][0] + " inserida no input são consistentes, RC:" + RCValues[i][0]);
+                System.out.println("Os valores da matriz " + m_cabecalhos[i][0] + " inserida no input são consistentes, RC:" + RCValues[i][0]);
             }
         }
-        escolhas = calcularEscolhas(matrizCriterios, mPrioridadeRelativa, limiarCriterio, m_cabecalhos);
+        escolhas = calcularEscolhas(matrizCriterios, mPrioridadeRelativa, limiarCriterio, m_cabecalhos,log);
         System.out.println(" ");
         System.out.println("Escolhas:");
         if (op == 1) {
@@ -537,7 +561,7 @@ public class MetodoAHP {
      * @return
      */
     public static int juntarDados(String[][] matrizTotal, int nLinhasOutput, int op, double[][] matrizCriterios, String[][] m_cabecalhos, double[][] matrizTotalCriterios, double[][] matrizSomatorios, double[][] matrizCriteriosNormalizada, double[][] matrizTotalNormalizacao, double[][] mPrioridadeRelativa) {
-        int nColuna = 0;
+        //int nColuna = 0;
         for (int nMatriz = 0; nMatriz < N_CRITERIOS + 1; nMatriz++) {
             if (nMatriz == 0) {
                 nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
@@ -553,12 +577,12 @@ public class MetodoAHP {
             if (nMatriz == 0) {
                 nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
                 nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(matrizCriteriosNormalizada, op), nLinhasOutput);
-                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
+                nMatriz = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nMatriz);
                 nLinhasOutput++;
             } else {
                 nLinhasOutput = adicionarDadosCabecalho(matrizTotal, m_cabecalhos[nMatriz], nLinhasOutput);
                 nLinhasOutput = adicionarDadosMatrizes(matrizTotal, DoubleToString(identificarMatriz(matrizTotalNormalizacao, nMatriz - 1, N_ALTERNATIVAS), op), nLinhasOutput);
-                nColuna = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nColuna);
+                nMatriz = adicionarVetorPrioridades(matrizTotal, DoubleToString(mPrioridadeRelativa, op), nLinhasOutput, nMatriz);
                 nLinhasOutput++;
             }
         }
@@ -584,27 +608,25 @@ public class MetodoAHP {
         return nLinhasOutput;
     }
 
-    private static int adicionarVetorPrioridades(String[][] matrizTotal, String[][] matrizPrioridades, int nLinhasOutput, int nColuna) {
-        if (nColuna == 0) {
-            for (int i = 0; i < matrizPrioridades.length; i++) {
-                if (i == 0) {
-                    matrizTotal[nLinhasOutput - matrizPrioridades[nColuna].length + i][N_ALTERNATIVAS + 1] = "Prioridade Relativa";
-                } else {
-                    matrizTotal[nLinhasOutput - matrizPrioridades[nColuna].length + i][N_ALTERNATIVAS + 1] = matrizPrioridades[i - 1][nColuna];
-                }
-            }
-            nColuna++;
-        } else if (nColuna != 0) {
-            for (int i = -1; i < matrizPrioridades.length; i++) {
+    private static int adicionarVetorPrioridades(String[][] matrizTotal, String[][] matrizPrioridades, int nLinhasOutput, int nMatriz) {
+        if (nMatriz == 0) {
+            for (int i = -1; i < N_CRITERIOS; i++) {
                 if (i == -1) {
-                    matrizTotal[nLinhasOutput - matrizPrioridades[nColuna].length + i][N_ALTERNATIVAS + 1] = "Prioridade Relativa";
+                    matrizTotal[(nLinhasOutput - N_CRITERIOS) + i][N_ALTERNATIVAS + 2] = "Prioridade Relativa";
                 } else {
-                    matrizTotal[nLinhasOutput - matrizPrioridades[nColuna].length + i][N_ALTERNATIVAS + 1] = matrizPrioridades[i][nColuna];
+                    matrizTotal[(nLinhasOutput - N_CRITERIOS) + i][N_ALTERNATIVAS + 2] = matrizPrioridades[nMatriz][i];
                 }
             }
-            nColuna++;
+        } else if (nMatriz != 0) {
+            for (int i = -1; i < N_ALTERNATIVAS; i++) {
+                if (i == -1) {
+                    matrizTotal[(nLinhasOutput - N_ALTERNATIVAS) + i][N_ALTERNATIVAS + 2] = "Prioridade Relativa";
+                } else {
+                    matrizTotal[(nLinhasOutput - N_ALTERNATIVAS) + i][N_ALTERNATIVAS + 2] = matrizPrioridades[nMatriz][i];
+                }
+            }
         }
-        return nColuna;
+        return nMatriz;
     }
 
     /**
@@ -618,7 +640,7 @@ public class MetodoAHP {
         if (op == 1) {
             matriz = arredondar(matriz);
         }
-        String[][] matrizConvert = new String[matriz.length][matriz[0].length];
+        String[][] matrizConvert = new String[matriz.length][matriz.length];
         for (int i = 0; i < matriz.length; i++) {
             for (int j = 0; j < matriz[i].length; j++) {
                 matrizConvert[i][j] = String.valueOf(matriz[i][j]);
@@ -667,7 +689,7 @@ public class MetodoAHP {
     public static void printMatrizTotalInput(String[][] matrizTotal, int nLinhasOutput) {
         for (int i = 0; i < nLinhasOutput / 2; i++) {
             for (int j = 0; j < matrizTotal[i].length; j++) {
-                System.out.printf("%18s", matrizTotal[i][j]);
+                System.out.printf("%20s", matrizTotal[i][j]);
             }
             System.out.println(" ");
         }
@@ -683,7 +705,7 @@ public class MetodoAHP {
      * @param m_cabecalhos matriz dos cabecalhos
      * @return
      */
-    public static double[][] calcularEscolhas(double[][] matrizCriterios, double[][] mPrioridadeRelativa, double limiarCriterio, String[][] m_cabecalhos) {
+    public static double[][] calcularEscolhas(double[][] matrizCriterios, double[][] mPrioridadeRelativa, double limiarCriterio, String[][] m_cabecalhos,Formatter log) {
         int[] posicao = new int[N_CRITERIOS];
         int contPos = 0, NCriteriosIrrelevantes = 0, c = 0;
         posicao = verificacaoLimiar(mPrioridadeRelativa, limiarCriterio, posicao);
@@ -692,7 +714,7 @@ public class MetodoAHP {
         double[][] matrizPrioridades = new double[matrizCriterios.length - NCriteriosIrrelevantes][1], escolhas;
         for (int i = 0; i < matrizPrioridades.length; i++) {
             if (posicao[i] != 1) {
-                matrizPrioridades[contPos][0] = mPrioridadeRelativa[i][0];
+                matrizPrioridades[contPos][0] = mPrioridadeRelativa[0][i];
                 contPos++;
             }
         }
@@ -707,27 +729,33 @@ public class MetodoAHP {
                 }
             }
         }
-        contPos = 1;
-        c = 0;
-        double[][] matrizPrioridadesCriterios = new double[mPrioridadeRelativa.length][mPrioridadeRelativa.length - 1 - NCriteriosIrrelevantes];
-        for (int i = 0; i < matrizPrioridadesCriterios.length; i++) {
-            for (int j = 1; j < matrizPrioridadesCriterios[i].length + 1; j++) {
-                c++;
-                if (posicao[c - 1] != 1) {
-                    matrizPrioridadesCriterios[i][contPos - 1] = mPrioridadeRelativa[i][j];
-                    contPos++;
+        contPos = 0;
+        double[][] matrizPrioridadesCriterios = new double[mPrioridadeRelativa[1].length][mPrioridadeRelativa.length - 1];
+        double[][] matrizTemp = criarMatrizComposta(matrizPrioridadesCriterios, mPrioridadeRelativa);/*new double[N_ALTERNATIVAS][N_CRITERIOS-NCriteriosIrrelevantes];*/
+        for (int i = 0; i < matrizTemp.length; i++) {
+            for (int j = 0; j < matrizTemp[i].length - NCriteriosIrrelevantes; j++) {
+                if (posicao[j] != 1) {
+                    matrizPrioridadesCriterios[i][j] = matrizTemp[i][j];
                 }
             }
-            contPos = 1;
-            c = 0;
         }
-        escolhas = calcularMultiplicacao(matrizPrioridadesCriterios, matrizPrioridades);
+        escolhas = calcularMultiplicacao(matrizPrioridadesCriterios, matrizPrioridades,log);//Ja recebe as escolhas, mais testes required para o limiar
         return escolhas;
+    }
+
+    public static double[][] criarMatrizComposta(double[][] matrizPrioridadesCriterios, double[][] mPrioridadeRelativa) {
+        for (int i = 1; i < mPrioridadeRelativa.length; i++) {
+            for (int j = 0; j < mPrioridadeRelativa[i].length; j++) {
+                matrizPrioridadesCriterios[j][i - 1] = mPrioridadeRelativa[i][j];
+            }
+        }
+
+        return matrizPrioridadesCriterios;
     }
 
     public static int[] verificacaoLimiar(double[][] mPrioridadeRelativa, double limiarCriterio, int[] posicao) {
         for (int i = 0; i < posicao.length; i++) {
-            if (mPrioridadeRelativa[i][0] < limiarCriterio) {
+            if (mPrioridadeRelativa[0][i] < limiarCriterio) {
                 posicao[i] = 1;
             }
         }
@@ -774,8 +802,8 @@ public class MetodoAHP {
         }
         return melhorEscolha;
     }
-    
-    public static boolean confirmacaoDadosIrrelevantes(String[] posicaoDadosIrrelevantes){
+
+    public static boolean confirmacaoDadosIrrelevantes(String[] posicaoDadosIrrelevantes) {
         int flag = 0;
         for (int i = 0; i < posicaoDadosIrrelevantes.length; i++) {
             if (posicaoDadosIrrelevantes[i] != null) {
@@ -791,6 +819,7 @@ public class MetodoAHP {
 
     /**
      * OUTPUT PARA TXT
+     *
      * @param Output File de output definido pelo utilizador
      * @param matrizTotal matriz dos dados totais
      * @param escolhas matriz que guarda os dados das pontuações das escolhas
@@ -833,19 +862,17 @@ public class MetodoAHP {
         out.format("%20s", "Prioridade Composta");
         out.format("%n");
 
-        for (int a = 0; a < mPrioridadeRelativa.length; a++) {
-            for (int b = 1; b < mPrioridadeRelativa[a].length; b++) {
-                out.format("%20s", " | " + (double) Math.round(mPrioridadeRelativa[a][b] * 1000) / 1000);
+        for (int a = 0; a < mPrioridadeRelativa[1].length; a++) {
+            for (int b = 1; b < mPrioridadeRelativa.length; b++) {
+                out.format("%20s", " | " + (double) Math.round(mPrioridadeRelativa[b][a] * 1000) / 1000);
             }
             out.format("%n");
         }
         out.format("%n");
         out.format("%20s", "Pontuação Final");
         out.format("%n");
-        for (int a = 0; a < escolhas.length; a++) {
-            for (int b = 0; b < escolhas[a].length; b++) {
-                out.format("%20s", " " + m_cabecalhos[1][b] + " : " + (double) Math.round(escolhas[a][b] * 100) / 100);
-            }
+        for (int b = 0; b < escolhas.length; b++) {
+            out.format("%20s", "" + m_cabecalhos[1][b + 1] + " : " + (double) Math.round(escolhas[b][0] * 100) / 100);
             out.format("%n");
         }
         out.format("%n");
