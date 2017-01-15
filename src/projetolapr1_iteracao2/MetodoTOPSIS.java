@@ -74,7 +74,7 @@ public class MetodoTOPSIS {
                             mValoresIdeais = selectSolucoes(mPesada, criterios, custos);
                             vetorDistanciaIdealP = detDistanciaIdealP(mPesada, alternativas, criterios, mValoresIdeais);
                             vetorDistanciaIdeaIN = detDistanciaIdealN(mPesada, alternativas, criterios, mValoresIdeais);
-                            vetorPrioridadeComposta = vetorSolucao(vetorDistanciaIdealP, vetorDistanciaIdeaIN, alternativas);
+                            vetorPrioridadeComposta = vetorSolucao(vetorDistanciaIdeaIN, vetorDistanciaIdealP, alternativas);
                             melhorOpcao = melhorAlternativa(vetorPrioridadeComposta, alternativas);
                             printConsola(totalInput, nLinhas, mPesada, vetorPrioridadeComposta, melhorOpcao);
                             guardarOutputTotalTXT(output, criterios, alternativas, pesos, mCriterios, mNorm, mPesada, mValoresIdeais, vetorDistanciaIdealP, vetorDistanciaIdeaIN, vetorPrioridadeComposta, melhorOpcao);
@@ -467,11 +467,11 @@ public class MetodoTOPSIS {
      * @return, array com os valores resultantes da operação Ci*=Si'/(Si'+Si*)
      * do final do metodo topsis para cada alternativa
      */
-    public static double[] vetorSolucao(double[] matrizSeparacaoIdealN, double[] matrizSeparacaoIdealP, String[] alternativas) {
+    public static double[] vetorSolucao(double[] vetorDistanciaIdeaIN, double[] vetorDistanciaIdealP, String[] alternativas) {
         double valor = 0;
         double[] vetorPrio = new double[alternativas.length];
         for (int i = 0; i < alternativas.length; i++) {
-            valor = matrizSeparacaoIdealN[i] / (matrizSeparacaoIdealP[i] + matrizSeparacaoIdealN[i]);
+            valor = vetorDistanciaIdeaIN[i] / (vetorDistanciaIdeaIN[i] + vetorDistanciaIdealP[i]);
             vetorPrio[i] = valor;
         }
         return vetorPrio;
