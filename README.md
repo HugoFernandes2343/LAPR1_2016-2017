@@ -1,5 +1,7 @@
 
-# BUILD OUTPUT DESCRIPTION
+# This repository includes the work done by me, Hugo Carvalho, Marco Carneiro, Ruben Roriz in the Project Laboratory class of the Informatics Engineering degree at ISEP in the year 2016-2017 
+
+BUILD OUTPUT DESCRIPTION
 
 
 When you build an Java application project that has a main class, the IDE
